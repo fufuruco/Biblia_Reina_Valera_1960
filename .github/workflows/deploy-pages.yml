@@ -4,31 +4,20 @@ on:
   push:
     branches: [ main ]
 
-# Give the workflow explicit permissions for Pages
+# Give the workflow explicit permissions for Pages and repo contents
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    name: Build and upload artifact for Pages
+    name: Deploy to GitHub Pages (gh-pages)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: ./
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy to GitHub Pages
-    steps:
-      - name: Deploy
+      - name: Deploy to gh-pages via peaceiris
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
