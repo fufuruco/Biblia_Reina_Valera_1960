@@ -209,6 +209,27 @@
   .home-card-icon { font-size:2rem; margin-bottom:10px; }
   .home-card-title { font-size:0.95rem; color:var(--gold-light); font-weight:bold; }
   .home-card-sub { font-size:0.75rem; color:rgba(253,246,227,0.5); margin-top:4px; }
+  .notification-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(201,168,76,0.08));
+    border:1px solid rgba(201,168,76,0.25);
+    border-radius:10px; padding:18px 18px 16px; margin-bottom:18px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .notification-card-title { color:var(--gold); font-weight:bold; letter-spacing:0.08em; }
+  .notification-card-text { color:var(--text-light); font-size:0.9rem; line-height:1.4; }
+  .notify-btn {
+    background:var(--gold);
+    color:var(--dark);
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:Georgia,serif;
+    font-size:0.9rem;
+    font-weight:bold;
+    align-self:flex-start;
+  }
+  .notify-btn:hover { background:var(--gold-dark); }
   .daily-verse-card {
     background: linear-gradient(135deg, #1a0f02, #2d1e08);
     border:1px solid var(--gold-dark);
@@ -478,6 +499,11 @@
   </div>
   <div class="content">
     <div id="home-daily-card" class="daily-verse-card"></div>
+    <div class="notification-card">
+      <div class="notification-card-title">📬 Notificaciones de consuelo</div>
+      <div class="notification-card-text">Activa un versículo inspirador cada hora mientras la app está abierta.</div>
+      <button class="notify-btn" id="notify-btn" onclick="initVerseNotifications()">Activar notificaciones</button>
+    </div>
     <div class="home-header">
       <h1>¿Qué deseas explorar?</h1>
       <p>Selecciona una sección para comenzar</p>
@@ -959,6 +985,20 @@ const SPECIAL_READINGS = [
       {text:"Con amor eterno te he amado; por tanto, te prolongué mi misericordia.", ref:"Jeremías 31:3"},
       {text:"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref:"Jeremías 29:11"}
     ]
+  },
+  {
+    id:"estudio", icon:"📚", color:"#3a4a5c",
+    title:"Estudio de la Biblia",
+    desc:"Profundiza en la Palabra cada día",
+    verses:[
+      {text:"Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref:"Salmos 119:105"},
+      {text:"Toda la Escritura es inspirada por Dios, y útil para enseñar, para redargüir, para corregir, para instruir en justicia.", ref:"2 Timoteo 3:16"},
+      {text:"Escudriñadlo todo; retened lo bueno.", ref:"1 Tesalonicenses 5:21"},
+      {text:"Antes bien, creced en la gracia y el conocimiento de nuestro Señor y Salvador Jesucristo.", ref:"2 Pedro 3:18"},
+      {text:"Llevad la buena batalla de la fe; echa mano de la vida eterna.", ref:"1 Timoteo 6:12"},
+      {text:"Maravillosas son tus obras, oh Jehová; muy profundos son tus pensamientos.", ref:"Salmos 92:5"},
+      {text:"Porque la palabra de Dios es viva y eficaz, y más cortante que toda espada de dos filos.", ref:"Hebreos 4:12"}
+    ]
   }
 ];
 
@@ -1312,6 +1352,89 @@ function renderDailyContent() {
 
 function addDailyToFav(text, ref) {
   addToFavorites({book: ref.split(':')[0], chapter:0, verse:0, text, ref});
+}
+
+const HOURLY_COMFORT_VERSES = [
+  {text:"El Señor está cerca de los quebrantados de corazón; y salva a los contritos de espíritu.", ref:"Salmos 34:18"},
+  {text:"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.", ref:"Mateo 11:28"},
+  {text:"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios.", ref:"Filipenses 4:6"},
+  {text:"Jehová es mi pastor; nada me faltará.", ref:"Salmos 23:1"},
+  {text:"Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.", ref:"Salmos 46:1"},
+  {text:"Enjugará Dios toda lágrima de los ojos de ellos; y ya no habrá más llanto.", ref:"Apocalipsis 21:4"}
+];
+let hourlyNotificationTimer = null;
+let notificationsScheduled = false;
+
+function updateNotificationButton() {
+  const btn = document.getElementById('notify-btn');
+  if (!btn) return;
+  if (!('Notification' in window)) {
+    btn.textContent = 'Notificaciones no disponibles';
+    btn.disabled = true;
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    btn.textContent = notificationsScheduled ? 'Notificaciones activas' : 'Activar notificaciones';
+    btn.disabled = notificationsScheduled;
+  } else if (Notification.permission === 'denied') {
+    btn.textContent = 'Permite notificaciones en el navegador';
+    btn.disabled = true;
+  } else {
+    btn.textContent = 'Activar notificaciones';
+    btn.disabled = false;
+  }
+}
+
+function initVerseNotifications() {
+  if (!('Notification' in window)) {
+    showToast('Tu navegador no soporta notificaciones');
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    scheduleHourlyVerseNotification();
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    showToast('Notificaciones bloqueadas. Cambia los permisos del navegador.');
+    updateNotificationButton();
+    return;
+  }
+  Notification.requestPermission().then(result => {
+    if (result === 'granted') {
+      scheduleHourlyVerseNotification();
+    } else {
+      showToast('Notificaciones no activadas');
+      updateNotificationButton();
+    }
+  });
+}
+
+function scheduleHourlyVerseNotification() {
+  if (notificationsScheduled) {
+    showToast('Las notificaciones ya están activas');
+    return;
+  }
+  notificationsScheduled = true;
+  sendHourlyVerseNotification();
+  hourlyNotificationTimer = setInterval(sendHourlyVerseNotification, 60 * 60 * 1000);
+  showToast('✅ Notificaciones horarias activadas');
+  updateNotificationButton();
+}
+
+function sendHourlyVerseNotification() {
+  if (Notification.permission !== 'granted') {
+    return;
+  }
+  const verse = HOURLY_COMFORT_VERSES[Math.floor(Math.random() * HOURLY_COMFORT_VERSES.length)];
+  try {
+    new Notification('Versículo de consuelo', {
+      body: `${verse.text} — ${verse.ref}`,
+      icon: 'https://raw.githubusercontent.com/favicon.ico',
+      badge: 'https://raw.githubusercontent.com/favicon.ico'
+    });
+  } catch (error) {
+    showToast(`📬 ${verse.ref}`);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1815,6 +1938,7 @@ function showSearch() {
 // ═══════════════════════════════════════════════════════
 updateFavBadge();
 currentDayIndex = new Date().getDay();
+updateNotificationButton();
 
 // Mostrar indicador de carga
 document.getElementById('loading-indicator').style.display = 'block';
