@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# IDEs / Editores
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Builds Android / APK
+*.apk
+*.aab
+*.ap_
+*.dex
+build/
+.gradle/
+local.properties
+*.iml
+captures/
+
+# Logs
+*.log
+runs.json
+runs/
