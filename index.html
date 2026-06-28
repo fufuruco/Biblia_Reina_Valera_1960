@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Santa Biblia</title>
+<script src="Biblia.js"></script>
 <style>
   :root {
     --gold: #c9a84c;
@@ -23,7 +24,6 @@
     --purple: #4a1a6b;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html { font-size:16px; }
   body { font-family: 'Georgia', serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
 
   /* ─── VIEWS ─── */
@@ -192,21 +192,6 @@
 
   /* ─── CONTENT AREA ─── */
   .content { flex:1; overflow-y:auto; padding:20px 16px; max-width:800px; margin:0 auto; width:100%; }
-  .content { position:relative; z-index:1; }
-
-  /* Footer author line shown at the end of pages */
-  .page-footer {
-    margin-top:28px;
-    padding-top:18px;
-    border-top:2px solid rgba(201,168,76,0.15);
-    text-align:center;
-    color:var(--gold-dark);
-    font-weight:700;
-    font-size:1rem;
-    letter-spacing:0.08em;
-    background: linear-gradient(180deg, transparent, rgba(201,168,76,0.02));
-  }
-  .page-footer .byline { display:block; margin-top:8px; color:var(--gold); font-size:1.05rem; }
 
   /* ─── HOME ─── */
   .home-header { text-align:center; margin-bottom:28px; }
@@ -390,8 +375,7 @@
   .bb-btn { position:relative; }
 
   /* ─── SPACE FOR BOTTOM BAR ─── */
-  .content { padding-bottom:120px; }
-
+.content { padding-bottom:100px; }
   /* ─── SEARCH ─── */
   .search-bar {
     background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2);
@@ -405,35 +389,53 @@
   .search-bar input::placeholder { color:rgba(201,168,76,0.4); }
   .search-bar span { color:rgba(201,168,76,0.5); }
 
+  /* ─── SEARCH MODAL ─── */
+  .search-modal {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center;
+    z-index:1000; opacity:0; pointer-events:none; transition:opacity 0.3s;
+  }
+  .search-modal.active { opacity:1; pointer-events:all; }
+  .search-modal-content {
+    background:var(--dark); border:2px solid var(--gold); border-radius:8px;
+    padding:20px; width:90%; max-width:400px; max-height:80vh; overflow-y:auto;
+  }
+  .search-modal h3 { color:var(--gold); margin:0 0 15px 0; text-align:center; }
+  .search-form { display:flex; flex-direction:column; gap:10px; }
+  .search-form input, .search-form select {
+    padding:8px; border:1px solid rgba(201,168,76,0.3); border-radius:4px;
+    background:var(--dark2); color:var(--cream); font-family:Georgia,serif;
+  }
+  .search-form .search-row { display:flex; gap:10px; }
+  .search-form .search-row input { flex:1; }
+  .search-form button {
+    background:var(--gold); color:var(--dark); border:none; padding:10px;
+    border-radius:4px; cursor:pointer; font-family:Georgia,serif; font-weight:bold;
+  }
+  .search-results { margin-top:15px; max-height:200px; overflow-y:auto; }
+  .search-result {
+    padding:8px; border-bottom:1px solid rgba(201,168,76,0.2); cursor:pointer;
+    transition:background 0.2s;
+  }
+  .search-result:hover { background:rgba(201,168,76,0.1); }
+  .search-result-ref { color:var(--gold); font-weight:bold; }
+  .search-result-text { color:var(--cream); font-size:0.9rem; margin-top:2px; }
+
   /* ─── VOICE CONTROLS ─── */
   .voice-controls {
-    position:fixed; bottom:120px; right:20px;
-    background:var(--dark); border:1px solid rgba(201,168,76,0.35);
-    border-radius:16px; padding:18px; width:280px;
+    position:fixed; bottom:120px; right:20px; background:var(--dark);
+    border:2px solid var(--gold); border-radius:8px; padding:15px;
     display:none; flex-direction:column; gap:10px; z-index:999;
-    box-shadow:0 16px 40px rgba(0,0,0,0.35);
   }
   .voice-controls.active { display:flex; }
-  .voice-controls h4 { color:var(--gold); margin:0; font-size:0.95rem; }
-  .voice-controls label { display:block; color:var(--cream); font-size:0.78rem; margin-bottom:4px; }
-  .voice-controls select,
-  .voice-controls input {
-    width:100%; padding:10px 12px; border-radius:10px;
-    border:1px solid rgba(201,168,76,0.25); background:var(--dark2);
-    color:var(--cream); font-family:Georgia,serif; font-size:0.9rem;
-  }
+  .voice-controls h4 { color:var(--gold); margin:0; font-size:0.9rem; }
   .voice-controls button {
-    flex:1; background:var(--gold); color:var(--dark);
-    border:none; padding:10px 12px; border-radius:10px;
-    cursor:pointer; font-family:Georgia,serif; font-size:0.9rem;
+    background:var(--gold); color:var(--dark); border:none; padding:8px 12px;
+    border-radius:4px; cursor:pointer; font-family:Georgia,serif; font-size:0.8rem;
   }
-  .voice-controls .voice-btn-row { display:flex; gap:8px; }
-  .voice-controls .voice-btn-row button { width:100%; }
-
-  /* ─── RESPONSIVE ─── */
-  @media (min-width:600px) {
-    .cards-grid { grid-template-columns:repeat(3,1fr); }
-    .content { max-width:680px; }
+  .voice-controls select {
+    padding:6px; border:1px solid rgba(201,168,76,0.3); border-radius:4px;
+    background:var(--dark2); color:var(--cream); font-family:Georgia,serif; font-size:0.8rem;
   }
 </style>
 </head>
@@ -452,12 +454,14 @@
     <div class="cover-subtitle">La Palabra de Dios</div>
     <div class="cover-title">Santa<br>Biblia</div>
     <div class="cover-subtitle" style="margin-top:8px">Reina-Valera</div>
+    <div style="color:rgba(201,168,76,0.7); font-size:0.8rem; margin-top:20px; letter-spacing:0.2em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
     <div class="cover-divider"></div>
     <p class="cover-verse">
       "Lámpara es a mis pies tu palabra,<br>y lumbrera a mi camino."
       <span>— Salmos 119:105</span>
     </p>
-    <button class="btn-cover" onclick="openApp()">Abrir ✦</button>
+    <div id="loading-indicator" style="display:block; color:var(--gold); font-size:0.9rem; margin:20px 0; text-align:center;">⏳ Cargando Biblia...</div>
+    <button class="btn-cover" id="open-btn" onclick="openApp()" disabled>Abrir ✦</button>
   </div>
 </div>
 
@@ -468,14 +472,7 @@
       <span class="nav-logo-cross">✝</span>
       <span class="nav-logo-title">Santa Biblia</span>
       <div class="nav-logo-right">
-        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
-        <select id="font-size-select" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
-          <option value="15">Pequeña</option>
-          <option value="16">Normal</option>
-          <option value="18">Grande</option>
-          <option value="20">Muy grande</option>
-        </select>
-        <button class="nav-icon-btn" title="Buscar" onclick="showSearch()">🔍</button>
+        <button class="nav-icon-btn" title="Buscar" onclick="showSearchModal()">🔍</button>
       </div>
     </div>
   </div>
@@ -507,7 +504,7 @@
         <div class="home-card-sub">Mis versículos guardados</div>
       </div>
     </div>
-    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+    <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
   </div>
   <div class="bottom-bar" id="bb-home">
     <button class="bb-btn active" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
@@ -526,13 +523,7 @@
       <span class="nav-logo-cross">✝</span>
       <span class="nav-logo-title" id="reader-header-title">Génesis 1</span>
       <div class="nav-logo-right">
-        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
-        <select id="font-size-select-reader" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
-          <option value="15">Pequeña</option>
-          <option value="16">Normal</option>
-          <option value="18">Grande</option>
-          <option value="20">Muy grande</option>
-        </select>
+        <button class="nav-icon-btn" title="Buscar" onclick="showSearchModal()">🔍</button>
         <button class="nav-icon-btn" title="Voz" onclick="toggleVoiceControls()">🔊</button>
         <button class="nav-icon-btn" onclick="prevChapter()">‹</button>
         <button class="nav-icon-btn" onclick="nextChapter()">›</button>
@@ -555,7 +546,7 @@
       <button class="chapter-fav-btn" onclick="toggleChapterFav()" id="chapter-fav-btn" title="Guardar capítulo en favoritos">☆ Capítulo</button>
     </div>
     <div id="verses-container"></div>
-    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+    <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
   </div>
   <div class="bottom-bar">
     <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
@@ -573,15 +564,6 @@
       <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
       <span class="nav-logo-cross">🌅</span>
       <span class="nav-logo-title">Lectura Diaria</span>
-      <div class="nav-logo-right">
-        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
-        <select id="font-size-select-daily" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
-          <option value="15">Pequeña</option>
-          <option value="16">Normal</option>
-          <option value="18">Grande</option>
-          <option value="20">Muy grande</option>
-        </select>
-      </div>
     </div>
   </div>
   <div class="content">
@@ -591,7 +573,7 @@
     </div>
     <div class="day-tabs" id="day-tabs"></div>
     <div id="daily-content"></div>
-    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+    <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
   </div>
   <div class="bottom-bar">
     <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
@@ -609,15 +591,6 @@
       <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
       <span class="nav-logo-cross">🙏</span>
       <span class="nav-logo-title">Lecturas Especiales</span>
-      <div class="nav-logo-right">
-        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
-        <select id="font-size-select-special" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
-          <option value="15">Pequeña</option>
-          <option value="16">Normal</option>
-          <option value="18">Grande</option>
-          <option value="20">Muy grande</option>
-        </select>
-      </div>
     </div>
   </div>
   <div class="content">
@@ -626,7 +599,7 @@
       <p>Dios tiene una palabra especial para ti hoy</p>
     </div>
     <div id="special-cards"></div>
-    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+    <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
   </div>
   <div class="bottom-bar">
     <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
@@ -644,15 +617,6 @@
       <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
       <span class="nav-logo-cross">⭐</span>
       <span class="nav-logo-title">Mis Favoritos</span>
-      <div class="nav-logo-right">
-        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
-        <select id="font-size-select-fav" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
-          <option value="15">Pequeña</option>
-          <option value="16">Normal</option>
-          <option value="18">Grande</option>
-          <option value="20">Muy grande</option>
-        </select>
-      </div>
     </div>
   </div>
   <div class="content">
@@ -661,7 +625,7 @@
       <p>Tu colección personal de versículos</p>
     </div>
     <div id="favorites-list"></div>
-    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+    <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
   </div>
   <div class="bottom-bar">
     <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
@@ -672,24 +636,105 @@
   </div>
 </div>
 
+<!-- ═══════════ SEARCH MODAL ═══════════ -->
+<div id="search-modal" class="search-modal">
+  <div class="search-modal-content">
+    <h3>🔍 Buscar en la Biblia</h3>
+    <form class="search-form" onsubmit="performSearch(event)">
+      <div class="search-row">
+        <input type="text" id="search-book" placeholder="Libro (ej: Juan)" list="books-list">
+        <input type="number" id="search-chapter" placeholder="Capítulo" min="1">
+        <input type="number" id="search-verse" placeholder="Versículo" min="1">
+      </div>
+      <input type="text" id="search-text" placeholder="Buscar texto (ej: amor, fe, Dios)">
+      <button type="submit">Buscar</button>
+    </form>
+    <datalist id="books-list">
+      <option value="Génesis">
+      <option value="Éxodo">
+      <option value="Levítico">
+      <option value="Números">
+      <option value="Deuteronomio">
+      <option value="Josué">
+      <option value="Jueces">
+      <option value="Rut">
+      <option value="1 Samuel">
+      <option value="2 Samuel">
+      <option value="1 Reyes">
+      <option value="2 Reyes">
+      <option value="1 Crónicas">
+      <option value="2 Crónicas">
+      <option value="Esdras">
+      <option value="Nehemías">
+      <option value="Ester">
+      <option value="Job">
+      <option value="Salmos">
+      <option value="Proverbios">
+      <option value="Eclesiastés">
+      <option value="Cantares">
+      <option value="Isaías">
+      <option value="Jeremías">
+      <option value="Lamentaciones">
+      <option value="Ezequiel">
+      <option value="Daniel">
+      <option value="Oseas">
+      <option value="Joel">
+      <option value="Amós">
+      <option value="Abdías">
+      <option value="Jonás">
+      <option value="Miqueas">
+      <option value="Nahúm">
+      <option value="Habacuc">
+      <option value="Sofonías">
+      <option value="Hageo">
+      <option value="Zacarías">
+      <option value="Malaquías">
+      <option value="Mateo">
+      <option value="Marcos">
+      <option value="Lucas">
+      <option value="Juan">
+      <option value="Hechos">
+      <option value="Romanos">
+      <option value="1 Corintios">
+      <option value="2 Corintios">
+      <option value="Gálatas">
+      <option value="Efesios">
+      <option value="Filipenses">
+      <option value="Colosenses">
+      <option value="1 Tesalonicenses">
+      <option value="2 Tesalonicenses">
+      <option value="1 Timoteo">
+      <option value="2 Timoteo">
+      <option value="Tito">
+      <option value="Filemón">
+      <option value="Hebreos">
+      <option value="Santiago">
+      <option value="1 Pedro">
+      <option value="2 Pedro">
+      <option value="1 Juan">
+      <option value="2 Juan">
+      <option value="3 Juan">
+      <option value="Judas">
+      <option value="Apocalipsis">
+    </datalist>
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<!-- ═══════════ VOICE CONTROLS ═══════════ -->
 <div id="voice-controls" class="voice-controls">
-  <h4>Lectura en voz alta</h4>
-  <label for="voice-select">Selecciona la voz</label>
-  <select id="voice-select" onchange="selectedVoiceIndex=parseInt(this.value)"></select>
-  <label for="voice-speed">Velocidad</label>
-  <input id="voice-speed" type="range" min="0.75" max="2" step="0.05" value="1" onchange="setVoiceSpeed(this.value)">
-  <div style="display:flex; justify-content:space-between; gap:8px;">
-    <span style="font-size:0.8rem; color:var(--cream);">x<span id="voice-speed-label">1.00</span></span>
-    <span style="font-size:0.8rem; color:rgba(201,168,76,0.8);">Puedes elegir voz masculina o femenina</span>
-  </div>
-  <div class="voice-btn-row">
-    <button onclick="speakCurrentChapter()">Leer capítulo</button>
-    <button onclick="pauseSpeech()">Pausa</button>
-  </div>
-  <div class="voice-btn-row">
-    <button onclick="resumeSpeech()">Continuar</button>
-    <button onclick="stopSpeech()">Detener</button>
-  </div>
+  <h4>🔊 Lectura en Voz Alta</h4>
+  <select id="voice-speed" onchange="setVoiceSpeed(this.value)">
+    <option value="0.5">Lento (0.5x)</option>
+    <option value="0.75">Moderado Lento (0.75x)</option>
+    <option value="1" selected>Normal (1x)</option>
+    <option value="1.25">Moderado Rápido (1.25x)</option>
+    <option value="1.5">Rápido (1.5x)</option>
+    <option value="2">Muy Rápido (2x)</option>
+  </select>
+  <button onclick="speakChapter()">Leer Capítulo</button>
+  <button onclick="speakVerse()">Leer Versículo</button>
+  <button onclick="stopSpeaking()">Detener</button>
 </div>
 
 <div id="toast">✦ Añadido a favoritos</div>
@@ -717,59 +762,15 @@ let BIBLE_RAW = [];
 // ═══════════════════════════════════════════════════════
 async function loadBible() {
   try {
-    // Obtener la ruta base del HTML
-    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
-    const candidatePaths = [
-      'Biblia.json',
-      './Biblia.json',
-      baseUrl + '/Biblia.json',
-      'APK/Biblia.json',
-      './APK/Biblia.json',
-      'APK/mobile/BibleApp/www/Biblia.json',
-      './APK/mobile/BibleApp/www/Biblia.json'
-    ];
-
-    let data = null;
-    let lastError = null;
-
-    for (const path of candidatePaths) {
-      try {
-        console.log('Intentando cargar desde: ' + path);
-        const response = await fetch(path);
-        if (response.ok) {
-          const text = await response.text();
-          const normalizedText = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
-          try {
-            data = JSON.parse(normalizedText);
-            console.log('✓ Archivo encontrado y parseado en: ' + path);
-            break;
-          } catch (parseErr) {
-            lastError = parseErr;
-            console.log('✗ Error al parsear JSON en ' + path + ': ' + parseErr.message);
-            continue;
-          }
-        } else {
-          console.log('✗ Respuesta HTTP ' + response.status + ' en ' + path);
-        }
-      } catch (e) {
-        lastError = e;
-        console.log('✗ Error en ' + path + ': ' + e.message);
-      }
+    if (typeof BIBLE_DATA === 'undefined' || !BIBLE_DATA) {
+      throw new Error('Biblia.js no cargado correctamente');
     }
 
-    if (!data) {
-      // Mostrar mensaje más claro al usuario en la UI
-      const container = document.getElementById('verses-container') || document.querySelector('.content');
-      if (container) {
-        container.innerHTML = `<div class="no-content"><div class="nc-icon">⚠️</div><p><strong>Error cargando Biblia.json.</strong><br>Verifica que el archivo exista en la misma carpeta que el HTML y que el sitio se sirva por HTTP/HTTPS (no abrir por file://).<br><br>Último error: ${lastError?.message || 'desconocido'}</p></div>`;
-      }
-      throw new Error('No se pudo cargar Biblia.json desde ninguna de las rutas. Último error: ' + (lastError?.message || lastError));
-    }
-
-    BIBLE_RAW = data;
+    console.log('✓ Cargando desde Biblia.js');
+    BIBLE_RAW = BIBLE_DATA;
 
     // Reorganizar datos: BIBLE_TEXT[book][chapter][verse] = text
-    for (const entry of data) {
+    for (const entry of BIBLE_RAW) {
       if (!BIBLE_TEXT[entry.Book]) {
         BIBLE_TEXT[entry.Book] = {};
       }
@@ -785,11 +786,10 @@ async function loadBible() {
         BIBLE_CHAPTER_TITLES[entry.Book][entry.Chapter] = entry.Title.trim();
       }
     }
-
-    console.log('✓ Biblia cargada: ' + Object.keys(BIBLE_TEXT).length + ' libros, ' + data.length + ' versículos');
     return true;
   } catch (error) {
-    console.error('Error al cargar Biblia:', error);
+    console.error('Error cargando Biblia.js:', error);
+    alert("⚠️ Error al cargar Biblia.js.\n\nAsegúrate de que el archivo 'Biblia.js' esté en la misma carpeta y que el servidor lo esté sirviendo correctamente.");
     return false;
   }
 }
@@ -1023,14 +1023,71 @@ const DAILY_READINGS = [
 let currentView = 'cover';
 let currentBook = 'Génesis';
 let currentChapter = 1;
-let favorites = JSON.parse(localStorage.getItem('bible_favorites') || '[]').map(f => ({type: f.type || 'verse', ...f}));
+let favorites = [];
+try {
+  favorites = JSON.parse(localStorage.getItem('bible_favorites') || '[]').map(f => ({type: f.type || 'verse', ...f}));
+} catch (e) {
+  console.error('Error loading favorites:', e);
+  favorites = [];
+}
 let currentDayIndex = new Date().getDay();
+
+// ═══════════════════════════════════════════════════════
+//  SWIPE DETECTION
+// ═══════════════════════════════════════════════════════
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+function handleTouchStart(e) {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}
+
+function handleTouchEnd(e) {
+  touchEndX = e.changedTouches[0].screenX;
+  touchEndY = e.changedTouches[0].screenY;
+  handleSwipe();
+}
+
+function handleMouseDown(e) {
+  touchStartX = e.screenX;
+  touchStartY = e.screenY;
+}
+
+function handleMouseUp(e) {
+  touchEndX = e.screenX;
+  touchEndY = e.screenY;
+  handleSwipe();
+}
+
+function handleSwipe() {
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
+  const minSwipeDistance = 50; // Minimum distance for swipe
+  const maxVerticalDistance = 100; // Max vertical movement to consider it horizontal
+
+  if (Math.abs(deltaX) > minSwipeDistance && Math.abs(deltaY) < maxVerticalDistance) {
+    if (deltaX > 0) {
+      // Swipe right - previous chapter
+      prevChapter();
+    } else {
+      // Swipe left - next chapter
+      nextChapter();
+    }
+  }
+}
 let isBibleLoaded = false;
 
 // ═══════════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════════
 function openApp() {
+  if (!isBibleLoaded || Object.keys(BIBLE_TEXT).length === 0) {
+    alert('⏳ Aún cargando la Biblia...\n\nPor favor espera a que termine la carga.');
+    return;
+  }
   navigate('home');
 }
 
@@ -1110,6 +1167,15 @@ function renderChaptersNav() {
 }
 
 function renderReader() {
+  // Remove existing swipe listeners to avoid duplicates
+  let readerContent = document.getElementById('reader-content');
+  if (readerContent) {
+    readerContent.removeEventListener('touchstart', handleTouchStart);
+    readerContent.removeEventListener('touchend', handleTouchEnd);
+    readerContent.removeEventListener('mousedown', handleMouseDown);
+    readerContent.removeEventListener('mouseup', handleMouseUp);
+  }
+
   renderBookNav();
   renderChaptersNav();
   document.getElementById('reader-header-title').textContent = `${currentBook} ${currentChapter}`;
@@ -1121,7 +1187,7 @@ function renderReader() {
   btn.textContent = chapterFaved ? '★ Capítulo' : '☆ Capítulo';
   btn.classList.toggle('faved', chapterFaved);
   const container = document.getElementById('verses-container');
-  
+
   // Validar si la Biblia está cargada
   if (!isBibleLoaded) {
     container.innerHTML = `<div class="no-content">
@@ -1132,7 +1198,7 @@ function renderReader() {
     </div>`;
     return;
   }
-  
+
   const chapterData = BIBLE_TEXT[currentBook]?.[currentChapter];
   if (!chapterData) {
     container.innerHTML = `<div class="no-content">
@@ -1156,6 +1222,28 @@ function renderReader() {
       </div>
     </div>`;
   }).join('');
+
+  // Scroll al inicio después de renderizar el contenido
+  // Probar múltiples formas de hacer scroll
+  window.scrollTo(0, 0);
+  setTimeout(() => {
+    const contentDiv = document.getElementById('reader-content');
+    if (contentDiv) {
+      contentDiv.scrollTop = 0;
+    }
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }, 50);
+
+  // Add swipe event listeners
+  readerContent = document.getElementById('reader-content');
+  if (readerContent) {
+    readerContent.addEventListener('touchstart', handleTouchStart, { passive: true });
+    readerContent.addEventListener('touchend', handleTouchEnd, { passive: true });
+    // Also add mouse events for desktop testing
+    readerContent.addEventListener('mousedown', handleMouseDown);
+    readerContent.addEventListener('mouseup', handleMouseUp);
+  }
 }
 
 function prevChapter() {
@@ -1499,183 +1587,17 @@ function showToast(msg) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  SEARCH (improved with full Bible)
+//  VOICE SYNTHESIS
 // ═══════════════════════════════════════════════════════
-function showSearch() {
-  const query = prompt('🔍 Buscar versículo (ej: "Juan 3:16" o "amor"):');
-  if (!query) return;
-  const q = query.toLowerCase().trim();
-  
-  // Try to parse as reference   
-  const refMatch = query.match(/^(.+?)\s+(\d+):(\d+)$/i);
-  if (refMatch) {
-    const b = ALL_BOOKS.find(b => b.toLowerCase().includes(refMatch[1].toLowerCase()));
-    if (b) {
-      currentBook = b;
-      currentChapter = parseInt(refMatch[2]);
-      navigate('reader');
-      setTimeout(() => {
-        const vEl = document.getElementById(`v-${b}-${currentChapter}-${refMatch[3]}`);
-        if (vEl) { vEl.style.background='rgba(201,168,76,0.15)'; vEl.scrollIntoView({behavior:'smooth',block:'center'}); }
-      }, 200);
-      return;
-    }
-  }
-  
-  // Búsqueda de texto en toda la Biblia
-  const results = [];
-  if (BIBLE_RAW && BIBLE_RAW.length > 0) {
-    for (const entry of BIBLE_RAW) {
-      if (entry.Text.toLowerCase().includes(q)) {
-        results.push({
-          book: entry.Book,
-          chapter: entry.Chapter,
-          verse: entry.Verse,
-          text: entry.Text
-        });
-        if (results.length >= 20) break;  // Buscar hasta 20 resultados
-      }
-    }
-  }
-  
-  if (results.length > 0) {
-    const first = results[0];
-    currentBook = first.book;
-    currentChapter = first.chapter;
-    navigate('reader');
-    showToast(`✦ ${results.length} resultado(s) encontrado(s) - Mostrando el primero`);
-    setTimeout(() => {
-      const vEl = document.getElementById(`v-${first.book}-${first.chapter}-${first.verse}`);
-      if (vEl) { vEl.style.background='rgba(201,168,76,0.15)'; vEl.scrollIntoView({behavior:'smooth',block:'center'}); }
-    }, 200);
-  } else {
-    alert('No se encontraron resultados para: "' + query + '"');
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════
-updateFavBadge();
-currentDayIndex = new Date().getDay();
-const VOICE_GENDER_PATTERNS = {
-  female: /female|frau|femme|mujer|woman|girl|donna|dame|feminine|mujer|femenina/i,
-  male: /male|man|hombre|boy|hombre|homme|masculine/i
-};
-let voiceRate = 1;
-let availableVoices = [];
+let speechSynthesis = window.speechSynthesis;
 let currentUtterance = null;
-let selectedVoiceIndex = 0;
+let voiceSpeed = 1;
 
-function initializeVoiceControlsWhenReady() {
-  if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', initVoiceControls);
-  } else {
-    initVoiceControls();
-  }
-}
-initializeVoiceControlsWhenReady();
-
-// Cargar Biblia JSON al iniciar
-(async () => {
-  console.log('Iniciando carga de Biblia.json...');
-  const success = await loadBible();
-  if (success) {
-    isBibleLoaded = true;
-    console.log('✓ Biblia cargada exitosamente');
-  } else {
-    console.error('Error: No se pudo cargar Biblia.json');
-    alert('⚠ Error al cargar Biblia.json\n\nVerifica que:\n1. El archivo "Biblia.json" esté en la misma carpeta\n2. Nombrado correctamente (con mayúscula)');
-  }
-})();
-
-function getSpeechSynthesis() {
-  return window.speechSynthesis || window.webkitSpeechSynthesis || null;
-}
-function detectVoiceGender(name) {
-  if (!name) return '';
-  if (VOICE_GENDER_PATTERNS.female.test(name)) return 'Mujer';
-  if (VOICE_GENDER_PATTERNS.male.test(name)) return 'Hombre';
-  return '';
-}
-function populateVoiceList() {
-  const synth = getSpeechSynthesis();
-  const select = document.getElementById('voice-select');
-  if (!select) return;
-  availableVoices = synth ? synth.getVoices() : [];
-  select.innerHTML = '';
-
-  if (availableVoices.length === 0) {
-    const option = document.createElement('option');
-    option.textContent = 'No se encontraron voces disponibles';
-    option.value = '';
-    select.appendChild(option);
-    return;
-  }
-
-  availableVoices.forEach((voice, index) => {
-    const option = document.createElement('option');
-    const gender = detectVoiceGender(voice.name);
-    option.value = index;
-    option.textContent = `${voice.name} (${voice.lang}${gender ? ' - ' + gender : ''})`;
-    select.appendChild(option);
-  });
-  select.value = selectedVoiceIndex;
-}
-
-function setVoiceSpeed(val) {
-  voiceRate = parseFloat(val) || 1;
-  document.getElementById('voice-speed-label').textContent = voiceRate.toFixed(2);
+function setVoiceSpeed(speed) {
+  voiceSpeed = parseFloat(speed);
   if (currentUtterance) {
-    currentUtterance.rate = voiceRate;
+    currentUtterance.rate = voiceSpeed;
   }
-}
-
-function speakCurrentChapter() {
-  const synth = getSpeechSynthesis();
-  if (!synth) {
-    alert('Tu navegador no soporta la síntesis de voz.');
-    return;
-  }
-  stopSpeech();
-  const text = getChapterText(currentBook, currentChapter);
-  if (!text) {
-    alert('No hay texto disponible para leer.');
-    return;
-  }
-  const utterance = new SpeechSynthesisUtterance(`${currentBook}, capítulo ${currentChapter}. ${text}`);
-  const voice = availableVoices[selectedVoiceIndex] || availableVoices.find(v => v.default) || availableVoices[0];
-  if (voice) utterance.voice = voice;
-  utterance.rate = voiceRate;
-  utterance.onend = () => { currentUtterance = null; };
-  utterance.onerror = (event) => { console.error('TTS Error:', event.error); };
-  currentUtterance = utterance;
-  synth.speak(utterance);
-}
-
-function pauseSpeech() {
-  const synth = getSpeechSynthesis();
-  if (!synth) return;
-  if (synth.speaking && !synth.paused) {
-    synth.pause();
-  }
-}
-
-function resumeSpeech() {
-  const synth = getSpeechSynthesis();
-  if (!synth) return;
-  if (synth.paused) {
-    synth.resume();
-  }
-}
-
-function stopSpeech() {
-  const synth = getSpeechSynthesis();
-  if (!synth) return;
-  if (synth.speaking || synth.paused) {
-    synth.cancel();
-  }
-  currentUtterance = null;
 }
 
 function toggleVoiceControls() {
@@ -1683,32 +1605,238 @@ function toggleVoiceControls() {
   controls.classList.toggle('active');
 }
 
-function initVoiceControls() {
-  const synth = getSpeechSynthesis();
-  if (!synth) {
-    const select = document.getElementById('voice-select');
-    if (select) select.innerHTML = '<option>La síntesis de voz no está disponible</option>';
+function speakChapter() {
+  if (!speechSynthesis) {
+    alert('❌ Tu navegador no soporta síntesis de voz');
     return;
   }
-  populateVoiceList();
-  synth.onvoiceschanged = populateVoiceList;
-  // Fallback for browsers that load voices asynchronously without firing the event
-  setTimeout(populateVoiceList, 250);
-  setTimeout(populateVoiceList, 1000);
+
+  stopSpeaking();
+
+  const chapterData = BIBLE_TEXT[currentBook]?.[currentChapter];
+  if (!chapterData) {
+    showToast('❌ Capítulo no encontrado');
+    return;
+  }
+
+  const text = Object.values(chapterData).join('. ');
+  const utterance = new SpeechSynthesisUtterance(`${currentBook} capítulo ${currentChapter}. ${text}`);
+  utterance.rate = voiceSpeed;
+  utterance.lang = 'es-ES'; // Español
+
+  utterance.onstart = () => showToast('🔊 Reproduciendo capítulo...');
+  utterance.onend = () => showToast('✅ Lectura terminada');
+
+  currentUtterance = utterance;
+  speechSynthesis.speak(utterance);
 }
 
-// FONT SIZE CONTROL
-function changeFontSize(val) {
-  const v = parseInt(val) || 16;
-  document.documentElement.style.fontSize = v + 'px';
-  try { localStorage.setItem('bible_font_size', v); } catch(e) {}
-  document.querySelectorAll('select[id^="font-size-select"]').forEach(s => s.value = String(v));
+function speakVerse() {
+  if (!speechSynthesis) {
+    alert('❌ Tu navegador no soporta síntesis de voz');
+    return;
+  }
+
+  stopSpeaking();
+
+  // Buscar el versículo resaltado o el primero del capítulo
+  const highlighted = document.querySelector('.verse-container[style*="rgba(201,168,76,0.15)"]');
+  let verseNum = 1;
+  let verseText = '';
+
+  if (highlighted) {
+    const id = highlighted.id;
+    const match = id.match(/v-.*-.*-(\d+)$/);
+    if (match) verseNum = parseInt(match[1]);
+  }
+
+  const chapterData = BIBLE_TEXT[currentBook]?.[currentChapter];
+  if (chapterData && chapterData[verseNum]) {
+    verseText = chapterData[verseNum];
+  } else {
+    showToast('❌ Versículo no encontrado');
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(`${currentBook} ${currentChapter}:${verseNum}. ${verseText}`);
+  utterance.rate = voiceSpeed;
+  utterance.lang = 'es-ES';
+
+  utterance.onstart = () => showToast('🔊 Reproduciendo versículo...');
+  utterance.onend = () => showToast('✅ Lectura terminada');
+
+  currentUtterance = utterance;
+  speechSynthesis.speak(utterance);
 }
 
-// Initialize font size from localStorage
-(function initFontSize() {
-  const saved = parseInt(localStorage.getItem('bible_font_size')) || 16;
-  changeFontSize(saved);
+function stopSpeaking() {
+  if (speechSynthesis) {
+    speechSynthesis.cancel();
+    currentUtterance = null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  ENHANCED SEARCH
+// ═══════════════════════════════════════════════════════
+function showSearchModal() {
+  document.getElementById('search-modal').classList.add('active');
+  document.getElementById('search-book').focus();
+}
+
+function hideSearchModal() {
+  document.getElementById('search-modal').classList.remove('active');
+  document.getElementById('search-results').innerHTML = '';
+  // Limpiar campos
+  document.getElementById('search-book').value = '';
+  document.getElementById('search-chapter').value = '';
+  document.getElementById('search-verse').value = '';
+  document.getElementById('search-text').value = '';
+}
+
+function performSearch(event) {
+  event.preventDefault();
+
+  const bookInput = document.getElementById('search-book').value.trim();
+  const chapterInput = document.getElementById('search-chapter').value.trim();
+  const verseInput = document.getElementById('search-verse').value.trim();
+  const textInput = document.getElementById('search-text').value.trim();
+
+  let results = [];
+
+  // Búsqueda por referencia específica
+  if (bookInput && chapterInput && verseInput) {
+    const book = ALL_BOOKS.find(b => b.toLowerCase().includes(bookInput.toLowerCase()));
+    if (book) {
+      const chapter = parseInt(chapterInput);
+      const verse = parseInt(verseInput);
+      const chapterData = BIBLE_TEXT[book]?.[chapter];
+      if (chapterData && chapterData[verse]) {
+        results.push({
+          book: book,
+          chapter: chapter,
+          verse: verse,
+          text: chapterData[verse],
+          ref: `${book} ${chapter}:${verse}`
+        });
+      }
+    }
+  }
+  // Búsqueda por libro y capítulo
+  else if (bookInput && chapterInput) {
+    const book = ALL_BOOKS.find(b => b.toLowerCase().includes(bookInput.toLowerCase()));
+    if (book) {
+      const chapter = parseInt(chapterInput);
+      const chapterData = BIBLE_TEXT[book]?.[chapter];
+      if (chapterData) {
+        Object.entries(chapterData).forEach(([verse, text]) => {
+          results.push({
+            book: book,
+            chapter: chapter,
+            verse: parseInt(verse),
+            text: text,
+            ref: `${book} ${chapter}:${verse}`
+          });
+        });
+      }
+    }
+  }
+  // Búsqueda por texto
+  else if (textInput) {
+    const query = textInput.toLowerCase();
+    if (BIBLE_RAW && BIBLE_RAW.length > 0) {
+      for (const entry of BIBLE_RAW) {
+        if (entry.Text.toLowerCase().includes(query)) {
+          results.push({
+            book: entry.Book,
+            chapter: entry.Chapter,
+            verse: entry.Verse,
+            text: entry.Text,
+            ref: `${entry.Book} ${entry.Chapter}:${entry.Verse}`
+          });
+          if (results.length >= 50) break; // Limitar resultados
+        }
+      }
+    }
+  }
+
+  displaySearchResults(results);
+}
+
+function displaySearchResults(results) {
+  const container = document.getElementById('search-results');
+
+  if (results.length === 0) {
+    container.innerHTML = '<div class="search-result" style="text-align:center; color:#888;">No se encontraron resultados</div>';
+    return;
+  }
+
+  container.innerHTML = results.map(result => `
+    <div class="search-result" onclick="goToVerse('${result.book}', ${result.chapter}, ${result.verse})">
+      <div class="search-result-ref">${result.ref}</div>
+      <div class="search-result-text">${result.text}</div>
+    </div>
+  `).join('');
+}
+
+function goToVerse(book, chapter, verse) {
+  currentBook = book;
+  currentChapter = chapter;
+  navigate('reader');
+  hideSearchModal();
+
+  setTimeout(() => {
+    const verseEl = document.getElementById(`v-${book}-${chapter}-${verse}`);
+    if (verseEl) {
+      verseEl.style.background = 'rgba(201,168,76,0.15)';
+      verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => verseEl.style.background = '', 3000);
+    }
+  }, 200);
+}
+
+// Cerrar modal al hacer clic fuera
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('search-modal');
+  if (e.target === modal) {
+    hideSearchModal();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  SEARCH (improved with full Bible)
+// ═══════════════════════════════════════════════════════
+function showSearch() {
+  showSearchModal();
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+updateFavBadge();
+currentDayIndex = new Date().getDay();
+
+// Mostrar indicador de carga
+document.getElementById('loading-indicator').style.display = 'block';
+
+// Cargar Biblia.js al iniciar
+(async () => {
+  console.log('Iniciando carga desde Biblia.js...');
+  const success = await loadBible();
+  if (success) {
+    isBibleLoaded = true;
+    console.log('✓ Biblia cargada exitosamente');
+    // Ocultar indicador de carga y habilitar botón
+    document.getElementById('loading-indicator').style.display = 'none';
+    document.getElementById('open-btn').disabled = false;
+    if (currentView === 'reader') {
+      renderReader();
+    }
+  } else {
+    console.error('Error: No se pudo cargar Biblia.js');
+    document.getElementById('loading-indicator').innerHTML = '❌ Error al cargar Biblia.js';
+    alert('⚠ Error al cargar Biblia.js\n\nVerifica que:\n1. El archivo "Biblia.js" esté en la misma carpeta\n2. El servidor esté sirviendo el archivo correctamente');
+  }
 })();
 </script>
 </body>
