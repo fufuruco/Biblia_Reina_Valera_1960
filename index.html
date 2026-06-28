@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Santa Biblia</title>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #8a6820;
+    --dark: #1a1209;
+    --dark2: #2a1f0e;
+    --dark3: #3d2e14;
+    --cream: #fdf6e3;
+    --cream2: #f5ead0;
+    --brown: #5c3d1e;
+    --text: #2c1a0e;
+    --text-light: #7a5c3a;
+    --red: #8b1a1a;
+    --blue: #1a3a6b;
+    --green: #1a5c2a;
+    --purple: #4a1a6b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { font-size:16px; }
+  body { font-family: 'Georgia', serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+  /* ─── VIEWS ─── */
+  .view { display:none; min-height:100vh; }
+  .view.active { display:flex; flex-direction:column; }
+
+  /* ─── COVER ─── */
+  #view-cover {
+    background: linear-gradient(160deg, #0d0800 0%, #1a1005 30%, #2d1e08 60%, #0d0800 100%);
+    align-items:center; justify-content:center; position:relative; overflow:hidden;
+  }
+  .cover-bg {
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.18) 0%, transparent 65%),
+                radial-gradient(ellipse at 20% 80%, rgba(201,168,76,0.08) 0%, transparent 50%);
+  }
+  .cover-border {
+    position:absolute; inset:16px;
+    border:2px solid rgba(201,168,76,0.3);
+    border-radius:4px;
+    pointer-events:none;
+  }
+  .cover-border::before {
+    content:''; position:absolute; inset:6px;
+    border:1px solid rgba(201,168,76,0.15);
+    border-radius:2px;
+  }
+  .cover-corner {
+    position:absolute; width:40px; height:40px;
+    border-color: var(--gold);
+    border-style: solid;
+    border-width:0;
+  }
+  .cover-corner.tl { top:24px; left:24px; border-top-width:2px; border-left-width:2px; }
+  .cover-corner.tr { top:24px; right:24px; border-top-width:2px; border-right-width:2px; }
+  .cover-corner.bl { bottom:24px; left:24px; border-bottom-width:2px; border-left-width:2px; }
+  .cover-corner.br { bottom:24px; right:24px; border-bottom-width:2px; border-right-width:2px; }
+  .cover-content { position:relative; text-align:center; padding:40px 20px; }
+  .cover-cross {
+    font-size:64px; color:var(--gold); margin-bottom:20px;
+    text-shadow: 0 0 30px rgba(201,168,76,0.6), 0 0 60px rgba(201,168,76,0.3);
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { text-shadow: 0 0 20px rgba(201,168,76,0.5), 0 0 40px rgba(201,168,76,0.2); }
+    50% { text-shadow: 0 0 40px rgba(201,168,76,0.9), 0 0 80px rgba(201,168,76,0.5), 0 0 120px rgba(201,168,76,0.2); }
+  }
+  .cover-title {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    color: var(--gold-light);
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    font-weight:bold;
+    line-height:1.1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  }
+  .cover-subtitle {
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
+    color: rgba(201,168,76,0.7);
+    letter-spacing:0.4em;
+    text-transform:uppercase;
+    margin-top:8px;
+    margin-bottom:4px;
+  }
+  .cover-divider {
+    width:180px; height:1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin:20px auto;
+  }
+  .cover-verse {
+    font-style:italic;
+    color:rgba(253,246,227,0.7);
+    font-size:0.95rem;
+    max-width:320px;
+    margin:0 auto 32px;
+    line-height:1.6;
+  }
+  .cover-verse span { display:block; color:rgba(201,168,76,0.6); font-style:normal; font-size:0.8rem; margin-top:6px; letter-spacing:0.1em; }
+  .btn-cover {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-dark));
+    color: var(--dark);
+    border:none;
+    padding:14px 48px;
+    font-size:1.1rem;
+    font-family:Georgia,serif;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    border-radius:2px;
+    cursor:pointer;
+    font-weight:bold;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+    transition: all 0.3s;
+  }
+  .btn-cover:hover { transform:translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.6); }
+
+  /* ─── TOP NAV ─── */
+  .top-nav {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    padding:10px 0 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    position:sticky; top:0; z-index:100;
+    flex-shrink:0;
+  }
+  .nav-logo {
+    display:flex; align-items:center; gap:10px;
+    padding:0 16px 10px;
+    border-bottom:1px solid rgba(201,168,76,0.2);
+  }
+  .nav-logo-cross { font-size:22px; color:var(--gold); }
+  .nav-logo-title { font-size:1.1rem; color:var(--gold-light); letter-spacing:0.1em; font-weight:bold; }
+  .nav-logo-right { margin-left:auto; display:flex; gap:6px; }
+  .nav-icon-btn {
+    background:none; border:none; color:rgba(201,168,76,0.7);
+    font-size:1.2rem; cursor:pointer; padding:4px 8px;
+    border-radius:4px; transition:all 0.2s;
+  }
+  .nav-icon-btn:hover, .nav-icon-btn.active { color:var(--gold); background:rgba(201,168,76,0.1); }
+  .nav-tabs {
+    display:flex; gap:0; overflow-x:auto; padding:0 8px;
+    scrollbar-width:none;
+  }
+  .nav-tabs::-webkit-scrollbar { display:none; }
+  .nav-tab {
+    background:none; border:none; color:rgba(201,168,76,0.6);
+    padding:8px 14px; font-size:0.8rem; letter-spacing:0.05em;
+    cursor:pointer; white-space:nowrap; font-family:Georgia,serif;
+    border-bottom:2px solid transparent; transition:all 0.2s;
+    text-transform:uppercase;
+  }
+  .nav-tab:hover { color:var(--gold); }
+  .nav-tab.active { color:var(--gold-light); border-bottom-color:var(--gold); }
+
+  /* ─── BOOK NAV BAR ─── */
+  .book-nav-bar {
+    background: var(--dark2);
+    padding:8px 0;
+    border-bottom:1px solid rgba(201,168,76,0.15);
+    flex-shrink:0;
+  }
+  .nav-row {
+    display:flex; align-items:center; gap:6px;
+    overflow-x:auto; padding:0 12px;
+    scrollbar-width:none;
+  }
+  .nav-row::-webkit-scrollbar { display:none; }
+  .nav-row + .nav-row { margin-top:6px; }
+  .nav-row-label {
+    font-size:0.65rem; color:var(--gold-dark);
+    text-transform:uppercase; letter-spacing:0.1em;
+    white-space:nowrap; flex-shrink:0;
+    padding-right:4px; border-right:1px solid rgba(201,168,76,0.2);
+    margin-right:2px;
+  }
+  .pill {
+    background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2);
+    color:rgba(253,246,227,0.7); padding:4px 10px; border-radius:20px;
+    font-size:0.75rem; cursor:pointer; white-space:nowrap;
+    transition:all 0.2s; font-family:Georgia,serif;
+  }
+  .pill:hover { background:rgba(201,168,76,0.2); color:var(--gold-light); }
+  .pill.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border-color:var(--gold); color:var(--dark);
+    font-weight:bold; box-shadow:0 2px 8px rgba(201,168,76,0.3);
+  }
+
+  /* ─── CONTENT AREA ─── */
+  .content { flex:1; overflow-y:auto; padding:20px 16px; max-width:800px; margin:0 auto; width:100%; }
+  .content { position:relative; z-index:1; }
+
+  /* Footer author line shown at the end of pages */
+  .page-footer {
+    margin-top:28px;
+    padding-top:18px;
+    border-top:2px solid rgba(201,168,76,0.15);
+    text-align:center;
+    color:var(--gold-dark);
+    font-weight:700;
+    font-size:1rem;
+    letter-spacing:0.08em;
+    background: linear-gradient(180deg, transparent, rgba(201,168,76,0.02));
+  }
+  .page-footer .byline { display:block; margin-top:8px; color:var(--gold); font-size:1.05rem; }
+
+  /* ─── HOME ─── */
+  .home-header { text-align:center; margin-bottom:28px; }
+  .home-header h1 { font-size:1.6rem; color:var(--brown); }
+  .home-header p { color:var(--text-light); font-style:italic; margin-top:4px; }
+  .home-date { font-size:0.85rem; color:var(--gold-dark); margin-top:4px; letter-spacing:0.05em; }
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; }
+  .home-card {
+    background: linear-gradient(135deg, var(--dark2), var(--dark3));
+    border:1px solid rgba(201,168,76,0.25);
+    border-radius:8px; padding:20px 14px; text-align:center;
+    cursor:pointer; transition:all 0.25s; color:var(--cream);
+  }
+  .home-card:hover { transform:translateY(-3px); border-color:var(--gold); box-shadow:0 6px 20px rgba(201,168,76,0.2); }
+  .home-card-icon { font-size:2rem; margin-bottom:10px; }
+  .home-card-title { font-size:0.95rem; color:var(--gold-light); font-weight:bold; }
+  .home-card-sub { font-size:0.75rem; color:rgba(253,246,227,0.5); margin-top:4px; }
+  .daily-verse-card {
+    background: linear-gradient(135deg, #1a0f02, #2d1e08);
+    border:1px solid var(--gold-dark);
+    border-radius:8px; padding:20px; margin-bottom:24px;
+    position:relative; overflow:hidden;
+  }
+  .daily-verse-card::before {
+    content:'"'; position:absolute; top:-10px; left:10px;
+    font-size:100px; color:rgba(201,168,76,0.06); font-family:Georgia; line-height:1;
+  }
+  .daily-verse-label { font-size:0.7rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:10px; }
+  .daily-verse-text { font-size:1rem; color:var(--cream); line-height:1.7; font-style:italic; }
+  .daily-verse-ref { font-size:0.8rem; color:var(--gold-dark); margin-top:10px; text-align:right; }
+
+  /* ─── READER ─── */
+  .chapter-header { text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid rgba(201,168,76,0.2); }
+  .chapter-header-book { font-size:0.75rem; color:var(--gold-dark); text-transform:uppercase; letter-spacing:0.15em; }
+  .chapter-header-title { font-size:1.8rem; color:var(--brown); font-weight:bold; margin-top:4px; }
+  .chapter-fav-btn { margin-top:8px; background:none; border:1px solid rgba(201,168,76,0.3); color:var(--gold-dark); padding:4px 12px; border-radius:4px; font-size:0.8rem; cursor:pointer; font-family:Georgia,serif; }
+  .chapter-fav-btn.faved { background:var(--gold-light); border-color:var(--gold); color:var(--dark); }
+  .chapter-header-subtitle { font-size:0.85rem; color:var(--text-light); margin-top:2px; font-style:italic; }
+  .verse-container { margin-bottom:8px; display:flex; gap:8px; align-items:flex-start; padding:6px; border-radius:6px; transition:background 0.15s; }
+  .verse-container:hover { background:rgba(201,168,76,0.06); }
+  .verse-num { font-size:0.7rem; color:var(--gold); font-weight:bold; min-width:22px; padding-top:3px; flex-shrink:0; }
+  .verse-text { font-size:1rem; line-height:1.75; color:var(--text); flex:1; }
+  .verse-text.red-letter { color:var(--red); }
+  .verse-actions { display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
+  .verse-btn { background:none; border:none; font-size:0.9rem; cursor:pointer; color:rgba(201,168,76,0.4); transition:color 0.2s; padding:2px; }
+  .verse-btn:hover { color:var(--gold); }
+  .verse-btn.faved { color:var(--gold); }
+  .no-content {
+    text-align:center; padding:40px 20px; color:var(--text-light);
+  }
+  .no-content .nc-icon { font-size:3rem; margin-bottom:12px; }
+  .no-content p { font-style:italic; }
+
+  /* ─── SPECIAL READINGS ─── */
+  .special-header { text-align:center; margin-bottom:24px; }
+  .special-header h1 { font-size:1.5rem; color:var(--brown); }
+  .special-header p { color:var(--text-light); font-style:italic; font-size:0.9rem; margin-top:4px; }
+  .special-card {
+    background:var(--cream2); border:1px solid rgba(92,61,30,0.2);
+    border-radius:10px; margin-bottom:14px; overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  .special-card-header {
+    display:flex; align-items:center; gap:12px; padding:16px;
+    cursor:pointer; transition:background 0.2s;
+  }
+  .special-card-header:hover { background:rgba(201,168,76,0.08); }
+  .special-icon { font-size:1.8rem; flex-shrink:0; }
+  .special-card-info { flex:1; }
+  .special-card-title { font-size:1rem; font-weight:bold; color:var(--brown); }
+  .special-card-desc { font-size:0.8rem; color:var(--text-light); margin-top:2px; }
+  .special-chevron { color:var(--gold-dark); font-size:1.1rem; transition:transform 0.3s; }
+  .special-card.open .special-chevron { transform:rotate(180deg); }
+  .special-verses {
+    display:none; padding:0 16px 16px; border-top:1px solid rgba(201,168,76,0.15);
+  }
+  .special-card.open .special-verses { display:block; }
+  .sv-item {
+    padding:12px 0; border-bottom:1px solid rgba(201,168,76,0.1);
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .sv-item:last-child { border-bottom:none; }
+  .sv-text { font-size:0.95rem; line-height:1.65; color:var(--text); font-style:italic; flex:1; }
+  .sv-ref { font-size:0.75rem; color:var(--gold-dark); margin-top:4px; font-style:normal; display:block; }
+  .sv-fav { background:none; border:none; font-size:1rem; cursor:pointer; color:rgba(201,168,76,0.4); flex-shrink:0; padding-top:2px; }
+  .sv-fav:hover, .sv-fav.faved { color:var(--gold); }
+
+  /* ─── DAILY READINGS ─── */
+  .daily-header { text-align:center; margin-bottom:20px; }
+  .daily-header h1 { font-size:1.5rem; color:var(--brown); }
+  .daily-header .day-badge {
+    display:inline-block; background:var(--gold); color:var(--dark);
+    padding:4px 16px; border-radius:20px; font-size:0.8rem; font-weight:bold;
+    margin-top:8px; letter-spacing:0.05em;
+  }
+  .day-tabs { display:flex; gap:8px; overflow-x:auto; margin-bottom:20px; padding-bottom:4px; scrollbar-width:none; }
+  .day-tabs::-webkit-scrollbar { display:none; }
+  .day-tab {
+    flex-shrink:0; padding:8px 16px; border-radius:20px; font-size:0.8rem;
+    border:1px solid rgba(201,168,76,0.3); background:none; cursor:pointer;
+    color:var(--text-light); font-family:Georgia,serif; transition:all 0.2s;
+  }
+  .day-tab.active { background:var(--gold); color:var(--dark); font-weight:bold; border-color:var(--gold); }
+  .day-tab:hover:not(.active) { border-color:var(--gold); color:var(--brown); }
+  .daily-reading-block { background:var(--cream2); border:1px solid rgba(201,168,76,0.2); border-radius:8px; padding:20px; margin-bottom:16px; }
+  .drb-title { font-size:0.75rem; color:var(--gold-dark); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:12px; }
+  .drb-verse { font-size:0.95rem; line-height:1.75; color:var(--text); font-style:italic; }
+  .drb-ref { font-size:0.8rem; color:var(--text-light); margin-top:10px; text-align:right; }
+  .drb-reflection { font-size:0.85rem; color:var(--text-light); margin-top:14px; padding-top:14px; border-top:1px solid rgba(201,168,76,0.15); line-height:1.6; }
+
+  /* ─── FAVORITES ─── */
+  .fav-header { text-align:center; margin-bottom:20px; }
+  .fav-header h1 { font-size:1.5rem; color:var(--brown); }
+  .fav-header p { color:var(--text-light); font-style:italic; font-size:0.9rem; margin-top:4px; }
+  .fav-empty { text-align:center; padding:60px 20px; color:var(--text-light); }
+  .fav-empty-icon { font-size:3rem; margin-bottom:12px; }
+  .fav-empty p { font-style:italic; line-height:1.6; }
+  .fav-item {
+    background:var(--cream2); border:1px solid rgba(201,168,76,0.2);
+    border-radius:8px; padding:14px; margin-bottom:10px;
+    display:flex; gap:10px; align-items:flex-start;
+    transition:all 0.2s;
+  }
+  .fav-item:hover { border-color:var(--gold); }
+  .fav-num { font-size:0.75rem; color:var(--gold); font-weight:bold; min-width:22px; padding-top:2px; flex-shrink:0; }
+  .fav-content { flex:1; }
+  .fav-text { font-size:0.95rem; line-height:1.65; color:var(--text); font-style:italic; }
+  .fav-ref { font-size:0.75rem; color:var(--gold-dark); margin-top:6px; display:block; }
+  .fav-actions { display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
+  .fav-del { background:none; border:none; font-size:0.9rem; cursor:pointer; color:rgba(139,26,26,0.4); transition:color 0.2s; }
+  .fav-del:hover { color:var(--red); }
+  .fav-up, .fav-dn { background:none; border:none; font-size:0.8rem; cursor:pointer; color:rgba(201,168,76,0.5); transition:color 0.2s; }
+  .fav-up:hover, .fav-dn:hover { color:var(--gold); }
+  .fav-count { font-size:0.75rem; color:var(--text-light); text-align:center; margin-bottom:12px; }
+  .btn-clear-fav {
+    display:block; margin:16px auto 0; background:none;
+    border:1px solid rgba(139,26,26,0.3); color:var(--red);
+    padding:8px 24px; border-radius:4px; cursor:pointer;
+    font-size:0.85rem; font-family:Georgia,serif; transition:all 0.2s;
+  }
+  .btn-clear-fav:hover { background:rgba(139,26,26,0.08); border-color:var(--red); }
+  .btn-export-fav {
+    display:block; margin:8px auto 0; background:none;
+    border:1px solid rgba(201,168,76,0.3); color:var(--gold-dark);
+    padding:8px 24px; border-radius:4px; cursor:pointer;
+    font-size:0.85rem; font-family:Georgia,serif; transition:all 0.2s;
+  }
+  .btn-export-fav:hover { background:rgba(201,168,76,0.08); border-color:var(--gold); }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--dark); color:var(--gold-light); padding:10px 20px;
+    border-radius:20px; font-size:0.85rem; border:1px solid var(--gold-dark);
+    opacity:0; transition:all 0.3s; z-index:999; white-space:nowrap; pointer-events:none;
+  }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ─── BOTTOM BAR ─── */
+  .bottom-bar {
+    position:fixed; bottom:0; left:0; right:0;
+    background: linear-gradient(135deg, var(--dark), var(--dark2));
+    border-top:1px solid rgba(201,168,76,0.2);
+    display:flex; justify-content:space-around; padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+    z-index:90;
+  }
+  .bb-btn {
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:none; cursor:pointer;
+    color:rgba(201,168,76,0.5); font-size:0.6rem; letter-spacing:0.05em;
+    text-transform:uppercase; padding:4px 12px; border-radius:8px; transition:all 0.2s;
+  }
+  .bb-btn .bb-icon { font-size:1.4rem; }
+  .bb-btn.active { color:var(--gold-light); }
+  .bb-btn.active .bb-icon { filter: drop-shadow(0 0 4px rgba(201,168,76,0.6)); }
+  .fav-badge {
+    position:absolute; top:-4px; right:-4px; background:var(--red);
+    color:#fff; font-size:0.6rem; border-radius:10px; padding:1px 5px;
+    min-width:16px; text-align:center;
+  }
+  .bb-btn { position:relative; }
+
+  /* ─── SPACE FOR BOTTOM BAR ─── */
+  .content { padding-bottom:120px; }
+
+  /* ─── SEARCH ─── */
+  .search-bar {
+    background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2);
+    border-radius:20px; display:flex; align-items:center; gap:8px;
+    padding:8px 14px; margin-bottom:16px;
+  }
+  .search-bar input {
+    background:none; border:none; outline:none; color:var(--cream);
+    font-size:0.9rem; flex:1; font-family:Georgia,serif;
+  }
+  .search-bar input::placeholder { color:rgba(201,168,76,0.4); }
+  .search-bar span { color:rgba(201,168,76,0.5); }
+
+  /* ─── VOICE CONTROLS ─── */
+  .voice-controls {
+    position:fixed; bottom:120px; right:20px;
+    background:var(--dark); border:1px solid rgba(201,168,76,0.35);
+    border-radius:16px; padding:18px; width:280px;
+    display:none; flex-direction:column; gap:10px; z-index:999;
+    box-shadow:0 16px 40px rgba(0,0,0,0.35);
+  }
+  .voice-controls.active { display:flex; }
+  .voice-controls h4 { color:var(--gold); margin:0; font-size:0.95rem; }
+  .voice-controls label { display:block; color:var(--cream); font-size:0.78rem; margin-bottom:4px; }
+  .voice-controls select,
+  .voice-controls input {
+    width:100%; padding:10px 12px; border-radius:10px;
+    border:1px solid rgba(201,168,76,0.25); background:var(--dark2);
+    color:var(--cream); font-family:Georgia,serif; font-size:0.9rem;
+  }
+  .voice-controls button {
+    flex:1; background:var(--gold); color:var(--dark);
+    border:none; padding:10px 12px; border-radius:10px;
+    cursor:pointer; font-family:Georgia,serif; font-size:0.9rem;
+  }
+  .voice-controls .voice-btn-row { display:flex; gap:8px; }
+  .voice-controls .voice-btn-row button { width:100%; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (min-width:600px) {
+    .cards-grid { grid-template-columns:repeat(3,1fr); }
+    .content { max-width:680px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PORTADA ═══════════ -->
+<div id="view-cover" class="view active">
+  <div class="cover-bg"></div>
+  <div class="cover-border"></div>
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-content">
+    <div class="cover-cross">✝</div>
+    <div class="cover-subtitle">La Palabra de Dios</div>
+    <div class="cover-title">Santa<br>Biblia</div>
+    <div class="cover-subtitle" style="margin-top:8px">Reina-Valera</div>
+    <div class="cover-divider"></div>
+    <p class="cover-verse">
+      "Lámpara es a mis pies tu palabra,<br>y lumbrera a mi camino."
+      <span>— Salmos 119:105</span>
+    </p>
+    <button class="btn-cover" onclick="openApp()">Abrir ✦</button>
+  </div>
+</div>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div id="view-home" class="view">
+  <div class="top-nav">
+    <div class="nav-logo">
+      <span class="nav-logo-cross">✝</span>
+      <span class="nav-logo-title">Santa Biblia</span>
+      <div class="nav-logo-right">
+        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
+        <select id="font-size-select" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
+          <option value="15">Pequeña</option>
+          <option value="16">Normal</option>
+          <option value="18">Grande</option>
+          <option value="20">Muy grande</option>
+        </select>
+        <button class="nav-icon-btn" title="Buscar" onclick="showSearch()">🔍</button>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div id="home-daily-card" class="daily-verse-card"></div>
+    <div class="home-header">
+      <h1>¿Qué deseas explorar?</h1>
+      <p>Selecciona una sección para comenzar</p>
+    </div>
+    <div class="cards-grid">
+      <div class="home-card" onclick="navigate('reader')">
+        <div class="home-card-icon">📖</div>
+        <div class="home-card-title">Leer la Biblia</div>
+        <div class="home-card-sub">Antiguo y Nuevo Testamento</div>
+      </div>
+      <div class="home-card" onclick="navigate('daily')">
+        <div class="home-card-icon">🌅</div>
+        <div class="home-card-title">Lectura Diaria</div>
+        <div class="home-card-sub">Devocional del día</div>
+      </div>
+      <div class="home-card" onclick="navigate('special')">
+        <div class="home-card-icon">🙏</div>
+        <div class="home-card-title">Lecturas Especiales</div>
+        <div class="home-card-sub">Para cada momento</div>
+      </div>
+      <div class="home-card" onclick="navigate('favorites')">
+        <div class="home-card-icon">⭐</div>
+        <div class="home-card-title">Favoritos</div>
+        <div class="home-card-sub">Mis versículos guardados</div>
+      </div>
+    </div>
+    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+  </div>
+  <div class="bottom-bar" id="bb-home">
+    <button class="bb-btn active" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
+    <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
+    <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
+    <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn"><span class="bb-icon">⭐</span>Favoritos</button>
+  </div>
+</div>
+
+<!-- ═══════════ READER ═══════════ -->
+<div id="view-reader" class="view">
+  <div class="top-nav">
+    <div class="nav-logo">
+      <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
+      <span class="nav-logo-cross">✝</span>
+      <span class="nav-logo-title" id="reader-header-title">Génesis 1</span>
+      <div class="nav-logo-right">
+        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
+        <select id="font-size-select-reader" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
+          <option value="15">Pequeña</option>
+          <option value="16">Normal</option>
+          <option value="18">Grande</option>
+          <option value="20">Muy grande</option>
+        </select>
+        <button class="nav-icon-btn" title="Voz" onclick="toggleVoiceControls()">🔊</button>
+        <button class="nav-icon-btn" onclick="prevChapter()">‹</button>
+        <button class="nav-icon-btn" onclick="nextChapter()">›</button>
+      </div>
+    </div>
+    <div class="book-nav-bar">
+      <div class="nav-row">
+        <span class="nav-row-label">A.T</span>
+        <div id="ot-books-row" style="display:contents"></div>
+        <span class="nav-row-label" style="margin-left:8px">N.T</span>
+        <div id="nt-books-row" style="display:contents"></div>
+      </div>
+      <div class="nav-row" id="chapters-row"></div>
+    </div>
+  </div>
+  <div class="content" id="reader-content">
+    <div class="chapter-header">
+      <div class="chapter-header-book" id="ch-book-label"></div>
+      <div class="chapter-header-title" id="ch-title"></div>
+      <button class="chapter-fav-btn" onclick="toggleChapterFav()" id="chapter-fav-btn" title="Guardar capítulo en favoritos">☆ Capítulo</button>
+    </div>
+    <div id="verses-container"></div>
+    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+  </div>
+  <div class="bottom-bar">
+    <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
+    <button class="bb-btn active" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
+    <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
+    <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn2"><span class="bb-icon">⭐</span>Favoritos</button>
+  </div>
+</div>
+
+<!-- ═══════════ DAILY ═══════════ -->
+<div id="view-daily" class="view">
+  <div class="top-nav">
+    <div class="nav-logo">
+      <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
+      <span class="nav-logo-cross">🌅</span>
+      <span class="nav-logo-title">Lectura Diaria</span>
+      <div class="nav-logo-right">
+        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
+        <select id="font-size-select-daily" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
+          <option value="15">Pequeña</option>
+          <option value="16">Normal</option>
+          <option value="18">Grande</option>
+          <option value="20">Muy grande</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="daily-header">
+      <h1>Devocional</h1>
+      <div class="day-badge" id="daily-date-badge">Cargando...</div>
+    </div>
+    <div class="day-tabs" id="day-tabs"></div>
+    <div id="daily-content"></div>
+    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+  </div>
+  <div class="bottom-bar">
+    <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
+    <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
+    <button class="bb-btn active" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
+    <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn3"><span class="bb-icon">⭐</span>Favoritos</button>
+  </div>
+</div>
+
+<!-- ═══════════ SPECIAL ═══════════ -->
+<div id="view-special" class="view">
+  <div class="top-nav">
+    <div class="nav-logo">
+      <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
+      <span class="nav-logo-cross">🙏</span>
+      <span class="nav-logo-title">Lecturas Especiales</span>
+      <div class="nav-logo-right">
+        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
+        <select id="font-size-select-special" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
+          <option value="15">Pequeña</option>
+          <option value="16">Normal</option>
+          <option value="18">Grande</option>
+          <option value="20">Muy grande</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="special-header">
+      <h1>Para cada momento</h1>
+      <p>Dios tiene una palabra especial para ti hoy</p>
+    </div>
+    <div id="special-cards"></div>
+    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+  </div>
+  <div class="bottom-bar">
+    <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
+    <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
+    <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
+    <button class="bb-btn active" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn4"><span class="bb-icon">⭐</span>Favoritos</button>
+  </div>
+</div>
+
+<!-- ═══════════ FAVORITES ═══════════ -->
+<div id="view-favorites" class="view">
+  <div class="top-nav">
+    <div class="nav-logo">
+      <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
+      <span class="nav-logo-cross">⭐</span>
+      <span class="nav-logo-title">Mis Favoritos</span>
+      <div class="nav-logo-right">
+        <label style="display:inline-block;margin-right:8px;color:rgba(201,168,76,0.6);font-size:0.8rem">Tamaño</label>
+        <select id="font-size-select-fav" onchange="changeFontSize(this.value)" style="background:none;border:1px solid rgba(201,168,76,0.12);color:var(--gold-light);padding:4px 8px;border-radius:6px;margin-right:8px">
+          <option value="15">Pequeña</option>
+          <option value="16">Normal</option>
+          <option value="18">Grande</option>
+          <option value="20">Muy grande</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="fav-header">
+      <h1>Versículos Guardados</h1>
+      <p>Tu colección personal de versículos</p>
+    </div>
+    <div id="favorites-list"></div>
+    <div class="page-footer"><span class="byline">By Jorge Pereira</span></div>
+  </div>
+  <div class="bottom-bar">
+    <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
+    <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
+    <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
+    <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn active" onclick="navigate('favorites')"><span class="bb-icon">⭐</span>Favoritos</button>
+  </div>
+</div>
+
+<div id="voice-controls" class="voice-controls">
+  <h4>Lectura en voz alta</h4>
+  <label for="voice-select">Selecciona la voz</label>
+  <select id="voice-select" onchange="selectedVoiceIndex=parseInt(this.value)"></select>
+  <label for="voice-speed">Velocidad</label>
+  <input id="voice-speed" type="range" min="0.75" max="2" step="0.05" value="1" onchange="setVoiceSpeed(this.value)">
+  <div style="display:flex; justify-content:space-between; gap:8px;">
+    <span style="font-size:0.8rem; color:var(--cream);">x<span id="voice-speed-label">1.00</span></span>
+    <span style="font-size:0.8rem; color:rgba(201,168,76,0.8);">Puedes elegir voz masculina o femenina</span>
+  </div>
+  <div class="voice-btn-row">
+    <button onclick="speakCurrentChapter()">Leer capítulo</button>
+    <button onclick="pauseSpeech()">Pausa</button>
+  </div>
+  <div class="voice-btn-row">
+    <button onclick="resumeSpeech()">Continuar</button>
+    <button onclick="stopSpeech()">Detener</button>
+  </div>
+</div>
+
+<div id="toast">✦ Añadido a favoritos</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  BIBLE DATA — Reina-Valera 1960
+// ═══════════════════════════════════════════════════════
+const OT_BOOKS = ["Génesis","Éxodo","Levítico","Números","Deuteronomio","Josué","Jueces","Rut","1 Samuel","2 Samuel","1 Reyes","2 Reyes","1 Crónicas","2 Crónicas","Esdras","Nehemías","Ester","Job","Salmos","Proverbios","Eclesiastés","Cantares","Isaías","Jeremías","Lamentaciones","Ezequiel","Daniel","Oseas","Joel","Amós","Abdías","Jonás","Miqueas","Nahúm","Habacuc","Sofonías","Hageo","Zacarías","Malaquías"];
+const NT_BOOKS = ["Mateo","Marcos","Lucas","Juan","Hechos","Romanos","1 Corintios","2 Corintios","Gálatas","Efesios","Filipenses","Colosenses","1 Tesalonicenses","2 Tesalonicenses","1 Timoteo","2 Timoteo","Tito","Filemón","Hebreos","Santiago","1 Pedro","2 Pedro","1 Juan","2 Juan","3 Juan","Judas","Apocalipsis"];
+const ALL_BOOKS = [...OT_BOOKS, ...NT_BOOKS];
+
+const CHAPTER_COUNT = {
+  "Génesis":50,"Éxodo":40,"Levítico":27,"Números":36,"Deuteronomio":34,"Josué":24,"Jueces":21,"Rut":4,"1 Samuel":31,"2 Samuel":24,"1 Reyes":22,"2 Reyes":25,"1 Crónicas":29,"2 Crónicas":36,"Esdras":10,"Nehemías":13,"Ester":10,"Job":42,"Salmos":150,"Proverbios":31,"Eclesiastés":12,"Cantares":8,"Isaías":66,"Jeremías":52,"Lamentaciones":5,"Ezequiel":48,"Daniel":12,"Oseas":14,"Joel":3,"Amós":9,"Abdías":1,"Jonás":4,"Miqueas":7,"Nahúm":3,"Habacuc":3,"Sofonías":3,"Hageo":2,"Zacarías":14,"Malaquías":4,
+  "Mateo":28,"Marcos":16,"Lucas":24,"Juan":21,"Hechos":28,"Romanos":16,"1 Corintios":16,"2 Corintios":13,"Gálatas":6,"Efesios":6,"Filipenses":4,"Colosenses":4,"1 Tesalonicenses":5,"2 Tesalonicenses":3,"1 Timoteo":6,"2 Timoteo":4,"Tito":3,"Filemón":1,"Hebreos":13,"Santiago":5,"1 Pedro":5,"2 Pedro":3,"1 Juan":5,"2 Juan":1,"3 Juan":1,"Judas":1,"Apocalipsis":22
+};
+
+// Full Bible text loaded from JSON
+let BIBLE_TEXT = {};
+let BIBLE_CHAPTER_TITLES = {};
+let BIBLE_RAW = [];
+
+// ═══════════════════════════════════════════════════════
+//  LOAD BIBLE FROM JSON
+// ═══════════════════════════════════════════════════════
+async function loadBible() {
+  try {
+    // Obtener la ruta base del HTML
+    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+    const candidatePaths = [
+      'Biblia.json',
+      './Biblia.json',
+      baseUrl + '/Biblia.json',
+      'APK/Biblia.json',
+      './APK/Biblia.json',
+      'APK/mobile/BibleApp/www/Biblia.json',
+      './APK/mobile/BibleApp/www/Biblia.json'
+    ];
+
+    let data = null;
+    let lastError = null;
+
+    for (const path of candidatePaths) {
+      try {
+        console.log('Intentando cargar desde: ' + path);
+        const response = await fetch(path);
+        if (response.ok) {
+          const text = await response.text();
+          const normalizedText = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+          try {
+            data = JSON.parse(normalizedText);
+            console.log('✓ Archivo encontrado y parseado en: ' + path);
+            break;
+          } catch (parseErr) {
+            lastError = parseErr;
+            console.log('✗ Error al parsear JSON en ' + path + ': ' + parseErr.message);
+            continue;
+          }
+        } else {
+          console.log('✗ Respuesta HTTP ' + response.status + ' en ' + path);
+        }
+      } catch (e) {
+        lastError = e;
+        console.log('✗ Error en ' + path + ': ' + e.message);
+      }
+    }
+
+    if (!data) {
+      // Mostrar mensaje más claro al usuario en la UI
+      const container = document.getElementById('verses-container') || document.querySelector('.content');
+      if (container) {
+        container.innerHTML = `<div class="no-content"><div class="nc-icon">⚠️</div><p><strong>Error cargando Biblia.json.</strong><br>Verifica que el archivo exista en la misma carpeta que el HTML y que el sitio se sirva por HTTP/HTTPS (no abrir por file://).<br><br>Último error: ${lastError?.message || 'desconocido'}</p></div>`;
+      }
+      throw new Error('No se pudo cargar Biblia.json desde ninguna de las rutas. Último error: ' + (lastError?.message || lastError));
+    }
+
+    BIBLE_RAW = data;
+
+    // Reorganizar datos: BIBLE_TEXT[book][chapter][verse] = text
+    for (const entry of data) {
+      if (!BIBLE_TEXT[entry.Book]) {
+        BIBLE_TEXT[entry.Book] = {};
+      }
+      if (!BIBLE_TEXT[entry.Book][entry.Chapter]) {
+        BIBLE_TEXT[entry.Book][entry.Chapter] = {};
+      }
+      BIBLE_TEXT[entry.Book][entry.Chapter][entry.Verse] = entry.Text;
+
+      if (!BIBLE_CHAPTER_TITLES[entry.Book]) {
+        BIBLE_CHAPTER_TITLES[entry.Book] = {};
+      }
+      if (!BIBLE_CHAPTER_TITLES[entry.Book][entry.Chapter] && entry.Title && entry.Title.trim()) {
+        BIBLE_CHAPTER_TITLES[entry.Book][entry.Chapter] = entry.Title.trim();
+      }
+    }
+
+    console.log('✓ Biblia cargada: ' + Object.keys(BIBLE_TEXT).length + ' libros, ' + data.length + ' versículos');
+    return true;
+  } catch (error) {
+    console.error('Error al cargar Biblia:', error);
+    return false;
+  }
+}
+
+// NOTA: El contenido anterior hardcodeado ha sido reemplazado por carga dinámica desde Biblia.json
+// Esto incluye todos los libros de Génesis a Apocalipsis
+
+// ═══════════════════════════════════════════════════════
+//  LECTURAS ESPECIALES
+// ═══════════════════════════════════════════════════════
+const SPECIAL_READINGS = [
+  {
+    id:"triste", icon:"🌧️", color:"#1a3a6b",
+    title:"Cuando estés triste",
+    desc:"Dios sana los corazones quebrantados",
+    verses:[
+      {text:"El Señor está cerca de los quebrantados de corazón; y salva a los contritos de espíritu.", ref:"Salmos 34:18"},
+      {text:"Bienaventurados los que lloran, porque ellos recibirán consolación.", ref:"Mateo 5:4"},
+      {text:"¿Por qué te abates, oh alma mía, y por qué te turbas dentro de mí? Espera en Dios; porque aún he de alabarle, Salvación mía y Dios mío.", ref:"Salmos 42:11"},
+      {text:"Él sana a los quebrantados de corazón, y venda sus heridas.", ref:"Salmos 147:3"},
+      {text:"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.", ref:"Mateo 11:28"},
+      {text:"Enjugará Dios toda lágrima de los ojos de ellos; y ya no habrá muerte, ni habrá más llanto, ni clamor, ni dolor.", ref:"Apocalipsis 21:4"},
+      {text:"Me ha enviado a sanar a los quebrantados de corazón; a pregonar libertad a los cautivos, y apertura de la cárcel a los presos.", ref:"Isaías 61:1"},
+      {text:"Por la noche durará el lloro, y a la mañana vendrá la alegría.", ref:"Salmos 30:5b"},
+      {text:"Los que sembraron con lágrimas, con regocijo segarán.", ref:"Salmos 126:5"}
+    ]
+  },
+  {
+    id:"animo", icon:"💪", color:"#1a5c2a",
+    title:"Cuando necesites ánimo",
+    desc:"Fuerzas renovadas en el Señor",
+    verses:[
+      {text:"Todo lo puedo en Cristo que me fortalece.", ref:"Filipenses 4:13"},
+      {text:"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.", ref:"Isaías 41:10"},
+      {text:"Los que esperan a Jehová tendrán nuevas fuerzas; levantarán alas como las águilas; correrán, y no se cansarán; caminarán, y no se fatigarán.", ref:"Isaías 40:31"},
+      {text:"Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo en dondequiera que vayas.", ref:"Josué 1:9"},
+      {text:"Esfuérzate y sé valiente; no temas ni te acobardes, porque Jehová tu Dios estará contigo.", ref:"Josué 1:9b"},
+      {text:"¿No te lo he mandado yo? Esfuérzate y sé valiente; no temas ni desmayes.", ref:"Josué 1:9a"},
+      {text:"El Señor es mi luz y mi salvación; ¿a quién temeré? Jehová es la fortaleza de mi vida; ¿de quién me he de atemorizar?", ref:"Salmos 27:1"},
+      {text:"Él da esfuerzo al cansado, y multiplica las fuerzas al que no tiene ningunas.", ref:"Isaías 40:29"},
+      {text:"Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien.", ref:"Romanos 8:28"}
+    ]
+  },
+  {
+    id:"miedo", icon:"😨", color:"#4a1a6b",
+    title:"Cuando tengas miedo",
+    desc:"El perfecto amor echa fuera el temor",
+    verses:[
+      {text:"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios. Siempre te ayudaré, siempre te sustentaré.", ref:"Isaías 41:10"},
+      {text:"El que habita al abrigo del Altísimo morará bajo la sombra del Omnipotente.", ref:"Salmos 91:1"},
+      {text:"Pues a sus ángeles mandará acerca de ti, que te guarden en todos tus caminos.", ref:"Salmos 91:11"},
+      {text:"En el amor no hay temor, sino que el perfecto amor echa fuera el temor.", ref:"1 Juan 4:18"},
+      {text:"No os he dado espíritu de cobardía, sino de poder, de amor y de dominio propio.", ref:"2 Timoteo 1:7"},
+      {text:"No se turbe vuestro corazón, ni tenga miedo.", ref:"Juan 14:27b"},
+      {text:"Jehová es mi luz y mi salvación; ¿a quién temeré?", ref:"Salmos 27:1"},
+      {text:"Aunque ande en valle de sombra de muerte, no temeré mal alguno, porque tú estarás conmigo.", ref:"Salmos 23:4"},
+      {text:"Jehová te guardará de todo mal; él guardará tu alma.", ref:"Salmos 121:7"},
+      {text:"Cuando pases por las aguas, yo estaré contigo; y si por los ríos, no te anegarán.", ref:"Isaías 43:2"}
+    ]
+  },
+  {
+    id:"maltrato", icon:"💔", color:"#8b1a1a",
+    title:"Cuando te traten mal",
+    desc:"Dios pelea tus batallas",
+    verses:[
+      {text:"Amad a vuestros enemigos, bendecid a los que os maldicen, haced bien a los que os aborrecen, y orad por los que os ultrajan y os persiguen.", ref:"Mateo 5:44"},
+      {text:"Bienaventurados sois cuando por mi causa os vituperen y os persigan; gozaos y alegraos, porque vuestro galardón es grande en los cielos.", ref:"Mateo 5:11-12"},
+      {text:"No os venguéis vosotros mismos, amados míos, sino dejad lugar a la ira de Dios; porque escrito está: Mía es la venganza, yo pagaré, dice el Señor.", ref:"Romanos 12:19"},
+      {text:"No seas vencido de lo malo, sino vence con el bien el mal.", ref:"Romanos 12:21"},
+      {text:"Bendecid a los que os persiguen; bendecid, y no maldigáis.", ref:"Romanos 12:14"},
+      {text:"Así que, si tu enemigo tuviere hambre, dale de comer; si tuviere sed, dale de beber.", ref:"Romanos 12:20"},
+      {text:"Porque yo Jehová soy tu Dios, quien te sostiene de tu mano derecha, y te dice: No temas, yo te ayudo.", ref:"Isaías 41:13"},
+      {text:"Nadie tiene mayor amor que este, que uno ponga su vida por sus amigos.", ref:"Juan 15:13"},
+      {text:"Si Dios es por nosotros, ¿quién contra nosotros?", ref:"Romanos 8:31"}
+    ]
+  },
+  {
+    id:"ansiedad", icon:"😰", color:"#1a4a4a",
+    title:"Cuando estés ansioso",
+    desc:"La paz de Dios que sobrepasa el entendimiento",
+    verses:[
+      {text:"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias. Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones.", ref:"Filipenses 4:6-7"},
+      {text:"Echando toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.", ref:"1 Pedro 5:7"},
+      {text:"No os afanéis por vuestra vida... ¿No es la vida más que el alimento, y el cuerpo más que el vestido?", ref:"Mateo 6:25"},
+      {text:"Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", ref:"Mateo 6:33"},
+      {text:"La paz os dejo, mi paz os doy; yo no os la doy como el mundo la da. No se turbe vuestro corazón, ni tenga miedo.", ref:"Juan 14:27"},
+      {text:"Confiad en Jehová con todo vuestro corazón, y no os apoyéis en vuestra propia prudencia.", ref:"Proverbios 3:5"},
+      {text:"Cuando te acuestes, no tendrás temor, sino que te acostarás, y tu sueño será grato.", ref:"Proverbios 3:24"},
+      {text:"Regocijaos en el Señor siempre. Otra vez digo: ¡Regocijaos!", ref:"Filipenses 4:4"},
+      {text:"Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.", ref:"Salmos 46:1"}
+    ]
+  },
+  {
+    id:"perdon", icon:"🕊️", color:"#5c3d1e",
+    title:"Cuando necesites perdón",
+    desc:"La misericordia de Dios es nueva cada mañana",
+    verses:[
+      {text:"Si confesamos nuestros pecados, él es fiel y justo para perdonar nuestros pecados, y limpiarnos de toda maldad.", ref:"1 Juan 1:9"},
+      {text:"Cuanto está lejos el oriente del occidente, hizo alejar de nosotros nuestras rebeliones.", ref:"Salmos 103:12"},
+      {text:"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref:"Juan 3:16"},
+      {text:"Ahora, pues, ninguna condenación hay para los que están en Cristo Jesús.", ref:"Romanos 8:1"},
+      {text:"Él es quien perdona todas tus iniquidades, el que sana todas tus dolencias.", ref:"Salmos 103:3"},
+      {text:"Misericordioso y clemente es Jehová; lento para la ira, y grande en misericordia.", ref:"Salmos 103:8"},
+      {text:"No ha hecho con nosotros conforme a nuestras iniquidades, ni nos ha pagado conforme a nuestros pecados.", ref:"Salmos 103:10"},
+      {text:"El sacrificio de Dios es el espíritu quebrantado; al corazón contrito y humillado no despreciarás tú, oh Dios.", ref:"Salmos 51:17"},
+      {text:"Venid luego, dice Jehová, y estemos a cuenta: si vuestros pecados fueren como la grana, como la nieve serán emblanquecidos.", ref:"Isaías 1:18"}
+    ]
+  },
+  {
+    id:"sabiduria", icon:"🌟", color:"#5c4a0e",
+    title:"Cuando necesites sabiduría",
+    desc:"Pide a Dios y Él dará abundantemente",
+    verses:[
+      {text:"Si alguno de vosotros tiene falta de sabiduría, pídala a Dios, el cual da a todos abundantemente y sin reproche, y le será dada.", ref:"Santiago 1:5"},
+      {text:"Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.", ref:"Proverbios 3:5-6"},
+      {text:"El principio de la sabiduría es el temor de Jehová; los que practican sus mandamientos tienen buen entendimiento.", ref:"Salmos 111:10"},
+      {text:"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal.", ref:"Jeremías 29:11"},
+      {text:"Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref:"Salmos 119:105"},
+      {text:"Bienaventurado el hombre que halla la sabiduría, y que obtiene la inteligencia.", ref:"Proverbios 3:13"},
+      {text:"Toda la Escritura es inspirada por Dios, y útil para enseñar, para redargüir, para corregir, para instruir en justicia.", ref:"2 Timoteo 3:16"},
+      {text:"Porque Jehová da la sabiduría, y de su boca viene el conocimiento y la inteligencia.", ref:"Proverbios 2:6"}
+    ]
+  },
+  {
+    id:"solo", icon:"🕯️", color:"#2a1f5c",
+    title:"Cuando estés solo",
+    desc:"Nunca te dejará ni te abandonará",
+    verses:[
+      {text:"Sean vuestras costumbres sin avaricia, contentos con lo que tenéis ahora; porque él dijo: No te desampararé, ni te dejaré.", ref:"Hebreos 13:5"},
+      {text:"¿A dónde me iré de tu Espíritu? ¿Y a dónde huiré de tu presencia? Si subiere a los cielos, allí estás tú.", ref:"Salmos 139:7-8"},
+      {text:"Oh Jehová, tú me has examinado y conocido. Tú has conocido mi sentarme y mi levantarme.", ref:"Salmos 139:1-2"},
+      {text:"Yo estoy con vosotros todos los días, hasta el fin del mundo.", ref:"Mateo 28:20"},
+      {text:"Y he aquí, yo estoy con vosotros todos los días, hasta el fin del mundo. Amén.", ref:"Mateo 28:20"},
+      {text:"Porque él dijo: No te desampararé, ni te dejaré; de manera que podemos decir confiadamente: El Señor es mi ayudador.", ref:"Hebreos 13:5-6"},
+      {text:"Aunque mi padre y mi madre me dejaran, con todo, Jehová me recogerá.", ref:"Salmos 27:10"},
+      {text:"Estad quietos, y conoced que yo soy Dios.", ref:"Salmos 46:10"},
+      {text:"Mi socorro viene de Jehová, que hizo los cielos y la tierra.", ref:"Salmos 121:2"}
+    ]
+  },
+  {
+    id:"enfermedad", icon:"🤒", color:"#1a3a1a",
+    title:"Cuando estés enfermo",
+    desc:"Jehová te sanará y restaurará",
+    verses:[
+      {text:"Él es quien perdona todas tus iniquidades, el que sana todas tus dolencias; el que rescata del hoyo tu vida.", ref:"Salmos 103:3-4"},
+      {text:"¿Está alguno enfermo entre vosotros? Llame a los ancianos de la iglesia, y oren por él, ungiéndole con aceite en el nombre del Señor.", ref:"Santiago 5:14"},
+      {text:"Y la oración de fe salvará al enfermo, y el Señor lo levantará; y si hubiere cometido pecados, le serán perdonados.", ref:"Santiago 5:15"},
+      {text:"Ciertamente llevó él nuestras enfermedades, y sufrió nuestros dolores.", ref:"Isaías 53:4"},
+      {text:"Mas él herido fue por nuestras rebeliones, molido por nuestros pecados; el castigo de nuestra paz fue sobre él, y por su llaga fuimos nosotros curados.", ref:"Isaías 53:5"},
+      {text:"Yo soy Jehová tu sanador.", ref:"Éxodo 15:26b"},
+      {text:"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo.", ref:"Isaías 41:10"},
+      {text:"El que habita al abrigo del Altísimo morará bajo la sombra del Omnipotente. No te sobrevendrá mal, ni plaga tocará tu morada.", ref:"Salmos 91:1,10"}
+    ]
+  },
+  {
+    id:"amor", icon:"❤️", color:"#6b1a1a",
+    title:"Para sentir el amor de Dios",
+    desc:"Nada puede separarte de Su amor",
+    verses:[
+      {text:"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref:"Juan 3:16"},
+      {text:"Dios es amor; y el que permanece en amor, permanece en Dios, y Dios en él.", ref:"1 Juan 4:16"},
+      {text:"Nosotros le amamos a él, porque él nos amó primero.", ref:"1 Juan 4:19"},
+      {text:"Ni lo alto, ni lo profundo, ni ninguna otra cosa creada nos podrá separar del amor de Dios, que es en Cristo Jesús Señor nuestro.", ref:"Romanos 8:39"},
+      {text:"El amor es sufrido, es benigno; el amor no tiene envidia, el amor no es jactancioso, no se envanece.", ref:"1 Corintios 13:4"},
+      {text:"Como el Padre me ha amado, así también yo os he amado; permaneced en mi amor.", ref:"Juan 15:9"},
+      {text:"El amor nunca deja de ser.", ref:"1 Corintios 13:8a"},
+      {text:"Con amor eterno te he amado; por tanto, te prolongué mi misericordia.", ref:"Jeremías 31:3"},
+      {text:"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref:"Jeremías 29:11"}
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+//  LECTURAS DIARIAS (7 días)
+// ═══════════════════════════════════════════════════════
+const DAILY_READINGS = [
+  {
+    day:"Domingo", theme:"El Descanso en Dios",
+    readings:[
+      {title:"Lectura de Salmos", text:"Jehová es mi pastor; nada me faltará. En lugares de delicados pastos me hará descansar; junto a aguas de reposo me pastoreará. Confortará mi alma; me guiará por sendas de justicia por amor de su nombre.", ref:"Salmos 23:1-3", reflection:"Hoy es un día para descansar en la presencia de Dios. Él te ofrece paz perfecta cuando confías plenamente en Él como tu pastor y guía."},
+      {title:"Lectura del Nuevo Testamento", text:"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar. Llevad mi yugo sobre vosotros, y aprended de mí, que soy manso y humilde de corazón; y hallaréis descanso para vuestras almas.", ref:"Mateo 11:28-29", reflection:"Jesús nos invita a dejar toda carga pesada a Sus pies. Su gracia es suficiente para cada necesidad que enfrentas hoy."}
+    ]
+  },
+  {
+    day:"Lunes", theme:"Nuevo Comienzo",
+    readings:[
+      {title:"Lectura de Proverbios", text:"Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.", ref:"Proverbios 3:5-6", reflection:"Al comenzar esta nueva semana, entrega cada plan y decisión a Dios. Él conoce el camino perfecto para tu vida."},
+      {title:"Lectura de Romanos", text:"Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien, esto es, a los que conforme a su propósito son llamados.", ref:"Romanos 8:28", reflection:"Cada situación que enfrentas hoy, buena o difícil, Dios puede usarla para tu bien. Confía en Su propósito eterno para tu vida."}
+    ]
+  },
+  {
+    day:"Martes", theme:"Fortaleza y Valentía",
+    readings:[
+      {title:"Lectura de Josué", text:"Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo en dondequiera que vayas.", ref:"Josué 1:9", reflection:"Dios va delante de ti en cada situación difícil. No hay obstáculo demasiado grande cuando Él está contigo."},
+      {title:"Lectura de Filipenses", text:"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias. Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones.", ref:"Filipenses 4:6-7", reflection:"Lleva cada preocupación a Dios en oración. Su paz sobrenatural guardará tu corazón y mente hoy."}
+    ]
+  },
+  {
+    day:"Miércoles", theme:"La Palabra de Dios",
+    readings:[
+      {title:"Lectura del Salmo 119", text:"Lámpara es a mis pies tu palabra, y lumbrera a mi camino. Juré y ratifiqué que guardaré tus justos juicios. Afligido estoy en gran manera; vivifícame, oh Jehová, conforme a tu palabra.", ref:"Salmos 119:105-107", reflection:"La Biblia no es solo un libro, es una carta de amor de Dios para ti. Cada día que lees Su Palabra, Él te habla directamente."},
+      {title:"Lectura de Hebreos", text:"Porque la palabra de Dios es viva y eficaz, y más cortante que toda espada de dos filos; y penetra hasta partir el alma y el espíritu, las coyunturas y los tuétanos, y discierne los pensamientos y las intenciones del corazón.", ref:"Hebreos 4:12", reflection:"La Palabra de Dios tiene poder para transformar tu vida de adentro hacia afuera. Permite que Él hable a tu corazón hoy."}
+    ]
+  },
+  {
+    day:"Jueves", theme:"Fe y Confianza",
+    readings:[
+      {title:"Lectura de Hebreos", text:"Es, pues, la fe la certeza de lo que se espera, la convicción de lo que no se ve. Pero sin fe es imposible agradar a Dios; porque es necesario que el que se acerca a Dios crea que le hay, y que es galardonador de los que le buscan.", ref:"Hebreos 11:1,6", reflection:"La fe no necesita ver para creer. Dios recompensa a quienes le buscan con todo el corazón, incluso en la oscuridad."},
+      {title:"Lectura de Isaías", text:"Los que esperan a Jehová tendrán nuevas fuerzas; levantarán alas como las águilas; correrán, y no se cansarán; caminarán, y no se fatigarán.", ref:"Isaías 40:31", reflection:"Cuando sientes que tus fuerzas se agotan, espera en Jehová. Él renueva las fuerzas de quienes confían en Él."}
+    ]
+  },
+  {
+    day:"Viernes", theme:"El Amor de Dios",
+    readings:[
+      {title:"Lectura de Juan", text:"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref:"Juan 3:16", reflection:"El amor de Dios se demostró de la manera más grande en la cruz. Hoy recuerda que eres amado con un amor eterno e incondicional."},
+      {title:"Lectura de 1 Corintios", text:"El amor es sufrido, es benigno; el amor no tiene envidia, el amor no es jactancioso, no se envanece... El amor nunca deja de ser.", ref:"1 Corintios 13:4,8", reflection:"Recibe el amor de Dios y deja que fluya a través de ti hacia los demás. El amor genuino transforma todo lo que toca."}
+    ]
+  },
+  {
+    day:"Sábado", theme:"Gratitud y Alabanza",
+    readings:[
+      {title:"Lectura de Salmos", text:"Bendice, alma mía, a Jehová, y bendiga todo mi ser su santo nombre. Bendice, alma mía, a Jehová, y no olvides ninguno de sus beneficios. Él es quien perdona todas tus iniquidades, el que sana todas tus dolencias.", ref:"Salmos 103:1-3", reflection:"Tómate un momento para contar las bendiciones de Dios en tu vida. La gratitud abre el corazón para recibir más de Su gracia."},
+      {title:"Lectura de Filipenses", text:"Regocijaos en el Señor siempre. Otra vez digo: ¡Regocijaos! Vuestra gentileza sea conocida de todos los hombres. El Señor está cerca.", ref:"Filipenses 4:4-5", reflection:"El gozo del Señor es tu fortaleza. No dependas de las circunstancias para ser feliz; encuentra tu alegría en Su presencia."}
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+//  APP STATE
+// ═══════════════════════════════════════════════════════
+let currentView = 'cover';
+let currentBook = 'Génesis';
+let currentChapter = 1;
+let favorites = JSON.parse(localStorage.getItem('bible_favorites') || '[]').map(f => ({type: f.type || 'verse', ...f}));
+let currentDayIndex = new Date().getDay();
+let isBibleLoaded = false;
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function openApp() {
+  navigate('home');
+}
+
+function navigate(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  currentView = view;
+  if (view === 'home') renderHome();
+  if (view === 'reader') renderReader();
+  if (view === 'daily') renderDaily();
+  if (view === 'special') renderSpecial();
+  if (view === 'favorites') renderFavorites();
+  updateFavBadge();
+  document.getElementById('view-' + view).querySelector('.content')?.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════════════════════
+function renderHome() {
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const now = new Date();
+  const dr = DAILY_READINGS[now.getDay()];
+  const r = dr.readings[0];
+  document.getElementById('home-daily-card').innerHTML = `
+    <div class="daily-verse-label">✦ Versículo del Día — ${days[now.getDay()]} ${now.getDate()} de ${months[now.getMonth()]}</div>
+    <div class="daily-verse-text">${r.text}</div>
+    <div class="daily-verse-ref">${r.ref}</div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+//  READER
+// ═══════════════════════════════════════════════════════
+function renderBookNav() {
+  const otRow = document.getElementById('ot-books-row');
+  const ntRow = document.getElementById('nt-books-row');
+  otRow.innerHTML = '';
+  ntRow.innerHTML = '';
+  OT_BOOKS.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'pill' + (b === currentBook ? ' active' : '');
+    el.textContent = b;
+    el.onclick = () => { currentBook = b; currentChapter = 1; renderReader(); };
+    otRow.appendChild(el);
+  });
+  NT_BOOKS.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'pill' + (b === currentBook ? ' active' : '');
+    el.textContent = b;
+    el.onclick = () => { currentBook = b; currentChapter = 1; renderReader(); };
+    ntRow.appendChild(el);
+  });
+  // Scroll active book into view
+  setTimeout(() => {
+    const active = document.querySelector('#ot-books-row .pill.active, #nt-books-row .pill.active');
+    if (active) active.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }, 50);
+}
+
+function renderChaptersNav() {
+  const row = document.getElementById('chapters-row');
+  row.innerHTML = `<span class="nav-row-label">Cap.</span>`;
+  const total = CHAPTER_COUNT[currentBook] || 1;
+  for (let i = 1; i <= total; i++) {
+    const el = document.createElement('button');
+    el.className = 'pill' + (i === currentChapter ? ' active' : '');
+    el.textContent = i;
+    el.onclick = () => { currentChapter = i; renderReader(); };
+    row.appendChild(el);
+  }
+  setTimeout(() => {
+    const active = row.querySelector('.pill.active');
+    if (active) active.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }, 50);
+}
+
+function renderReader() {
+  renderBookNav();
+  renderChaptersNav();
+  document.getElementById('reader-header-title').textContent = `${currentBook} ${currentChapter}`;
+  document.getElementById('ch-book-label').textContent = OT_BOOKS.includes(currentBook) ? 'Antiguo Testamento' : 'Nuevo Testamento';
+  const chapterTitle = BIBLE_CHAPTER_TITLES[currentBook]?.[currentChapter];
+  document.getElementById('ch-title').textContent = chapterTitle || `${currentBook} — Capítulo ${currentChapter}`;
+  const chapterFaved = favorites.some(f => f.type === 'chapter' && f.book === currentBook && f.chapter === currentChapter);
+  const btn = document.getElementById('chapter-fav-btn');
+  btn.textContent = chapterFaved ? '★ Capítulo' : '☆ Capítulo';
+  btn.classList.toggle('faved', chapterFaved);
+  const container = document.getElementById('verses-container');
+  
+  // Validar si la Biblia está cargada
+  if (!isBibleLoaded) {
+    container.innerHTML = `<div class="no-content">
+      <div class="nc-icon">📖</div>
+      <p><strong>⏳ Cargando Biblia...</strong><br><br>
+      Por favor espera mientras se carga el contenido.
+      </p>
+    </div>`;
+    return;
+  }
+  
+  const chapterData = BIBLE_TEXT[currentBook]?.[currentChapter];
+  if (!chapterData) {
+    container.innerHTML = `<div class="no-content">
+      <div class="nc-icon">📜</div>
+      <p>El contenido de <strong>${currentBook} ${currentChapter}</strong><br>no está disponible.<br><br>
+      <em>Intenta con otro capítulo</em></p>
+    </div>`;
+    return;
+  }
+  const verses = Object.entries(chapterData);
+  container.innerHTML = verses.map(([num, text]) => {
+    const isFaved = favorites.some(f => f.book === currentBook && f.chapter === currentChapter && f.verse === parseInt(num));
+    return `<div class="verse-container" id="v-${currentBook}-${currentChapter}-${num}">
+      <span class="verse-num">${num}</span>
+      <span class="verse-text">${text}</span>
+      <div class="verse-actions">
+        <button class="verse-btn ${isFaved?'faved':''}" onclick="toggleFav('${currentBook}',${currentChapter},${num})" title="Guardar en favoritos">
+          ${isFaved ? '★' : '☆'}
+        </button>
+        <button class="verse-btn" onclick="copyVerse('${currentBook}',${currentChapter},${num})" title="Copiar">📋</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function prevChapter() {
+  if (currentChapter > 1) { currentChapter--; }
+  else {
+    const idx = ALL_BOOKS.indexOf(currentBook);
+    if (idx > 0) { currentBook = ALL_BOOKS[idx-1]; currentChapter = CHAPTER_COUNT[currentBook] || 1; }
+  }
+  renderReader();
+}
+function nextChapter() {
+  if (currentChapter < (CHAPTER_COUNT[currentBook] || 1)) { currentChapter++; }
+  else {
+    const idx = ALL_BOOKS.indexOf(currentBook);
+    if (idx < ALL_BOOKS.length-1) { currentBook = ALL_BOOKS[idx+1]; currentChapter = 1; }
+  }
+  renderReader();
+}
+
+// ═══════════════════════════════════════════════════════
+//  DAILY READINGS
+// ═══════════════════════════════════════════════════════
+function renderDaily() {
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const now = new Date();
+  document.getElementById('daily-date-badge').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
+  // Day tabs
+  const tabsEl = document.getElementById('day-tabs');
+  tabsEl.innerHTML = DAILY_READINGS.map((d,i) =>
+    `<button class="day-tab ${i===currentDayIndex?'active':''}" onclick="selectDay(${i})">${d.day}</button>`
+  ).join('');
+  renderDailyContent();
+}
+
+function selectDay(idx) {
+  currentDayIndex = idx;
+  document.querySelectorAll('.day-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  renderDailyContent();
+}
+
+function renderDailyContent() {
+  const dr = DAILY_READINGS[currentDayIndex];
+  document.getElementById('daily-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px">
+      <span style="font-size:0.8rem;color:var(--gold-dark);text-transform:uppercase;letter-spacing:0.15em">
+        Tema del día
+      </span>
+      <h2 style="color:var(--brown);margin-top:4px">${dr.theme}</h2>
+    </div>
+    ${dr.readings.map(r => `
+      <div class="daily-reading-block">
+        <div class="drb-title">✦ ${r.title}</div>
+        <div class="drb-verse">${r.text}</div>
+        <div class="drb-ref">— ${r.ref}</div>
+        <div class="drb-reflection">💭 <strong>Reflexión:</strong> ${r.reflection}</div>
+        <button style="margin-top:12px;background:none;border:1px solid rgba(201,168,76,0.3);color:var(--gold-dark);padding:6px 14px;border-radius:4px;font-size:0.8rem;cursor:pointer;font-family:Georgia,serif;"
+          onclick="addDailyToFav('${r.text.replace(/'/g,"\\'")}','${r.ref}')">
+          ☆ Guardar como favorito
+        </button>
+      </div>
+    `).join('')}
+  `;
+}
+
+function addDailyToFav(text, ref) {
+  addToFavorites({book: ref.split(':')[0], chapter:0, verse:0, text, ref});
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPECIAL READINGS
+// ═══════════════════════════════════════════════════════
+function renderSpecial() {
+  const container = document.getElementById('special-cards');
+  container.innerHTML = SPECIAL_READINGS.map(cat => `
+    <div class="special-card" id="sc-${cat.id}">
+      <div class="special-card-header" onclick="toggleSpecial('${cat.id}')">
+        <div class="special-icon">${cat.icon}</div>
+        <div class="special-card-info">
+          <div class="special-card-title">${cat.title}</div>
+          <div class="special-card-desc">${cat.desc}</div>
+        </div>
+        <div class="special-chevron">▼</div>
+      </div>
+      <div class="special-verses">
+        ${cat.verses.map((v,i) => `
+          <div class="sv-item">
+            <div style="flex:1">
+              <div class="sv-text">"${v.text}"</div>
+              <span class="sv-ref">— ${v.ref}</span>
+            </div>
+            <button class="sv-fav ${favorites.some(f=>f.ref===v.ref)?'faved':''}"
+              id="svf-${cat.id}-${i}"
+              onclick="toggleSpecialFav('${cat.id}',${i})">★</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSpecial(id) {
+  const card = document.getElementById('sc-' + id);
+  card.classList.toggle('open');
+}
+
+function toggleSpecialFav(catId, idx) {
+  const cat = SPECIAL_READINGS.find(c => c.id === catId);
+  const v = cat.verses[idx];
+  const btn = document.getElementById(`svf-${catId}-${idx}`);
+  const existing = favorites.findIndex(f => f.ref === v.ref);
+  if (existing >= 0) {
+    favorites.splice(existing, 1);
+    btn.classList.remove('faved');
+    showToast('✦ Eliminado de favoritos');
+  } else {
+    addToFavorites({book: v.ref.split(':')[0], chapter:0, verse:0, text:v.text, ref:v.ref});
+    btn.classList.add('faved');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  FAVORITES
+// ═══════════════════════════════════════════════════════
+function renderFavorites() {
+  const container = document.getElementById('favorites-list');
+  if (favorites.length === 0) {
+    container.innerHTML = `<div class="fav-empty">
+      <div class="fav-empty-icon">⭐</div>
+      <p>Aún no tienes versículos o capítulos favoritos.<br><br>
+      Toca el <strong>★</strong> junto a cualquier versículo o capítulo<br>
+      para guardarlo aquí en el orden que elijas.</p>
+    </div>`;
+    return;
+  }
+  const verseCount = favorites.filter(f => f.type !== 'chapter').length;
+  const chapterCount = favorites.filter(f => f.type === 'chapter').length;
+  let countText = '';
+  if (verseCount > 0 && chapterCount > 0) {
+    countText = `${verseCount} versículo${verseCount!==1?'s':''} y ${chapterCount} capítulo${chapterCount!==1?'s':''}`;
+  } else if (verseCount > 0) {
+    countText = `${verseCount} versículo${verseCount!==1?'s':''}`;
+  } else {
+    countText = `${chapterCount} capítulo${chapterCount!==1?'s':''}`;
+  }
+  container.innerHTML = `
+    <div class="fav-count">✦ ${countText} guardado${favorites.length!==1?'s':''}</div>
+    ${favorites.map((f,i) => {
+      const isChapter = f.type === 'chapter';
+      const displayText = f.displayText || f.text;
+      const onclick = isChapter ? `toggleExpandFav(${i})` : `navigateToFav(${i})`;
+      return `
+      <div class="fav-item" id="fi-${i}">
+        <div class="fav-num">${i+1}</div>
+        <div class="fav-content" onclick="${onclick}" style="cursor:pointer;">
+          <div class="fav-text">${isChapter ? displayText : `"${displayText}"`}</div>
+          <span class="fav-ref">— ${f.ref}</span>
+        </div>
+        <div class="fav-actions">
+          <button class="fav-up" onclick="moveFav(${i},-1)" title="Subir" ${i===0?'style="opacity:0.2"':''}>▲</button>
+          <button class="fav-del" onclick="removeFav(${i})" title="Eliminar">✕</button>
+          <button class="fav-dn" onclick="moveFav(${i},1)" title="Bajar" ${i===favorites.length-1?'style="opacity:0.2"':''}>▼</button>
+        </div>
+      </div>
+    `}).join('')}
+    <button class="btn-clear-fav" onclick="confirmClearFavs()">🗑️ Limpiar todos los favoritos</button>
+    <button class="btn-export-fav" onclick="exportFavorites()">📤 Exportar favoritos</button>
+  `;
+}
+
+function moveFav(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= favorites.length) return;
+  const temp = favorites[idx];
+  favorites[idx] = favorites[newIdx];
+  favorites[newIdx] = temp;
+  saveFavorites();
+  renderFavorites();
+}
+
+function removeFav(idx) {
+  favorites.splice(idx, 1);
+  saveFavorites();
+  renderFavorites();
+  updateFavBadge();
+  showToast('✦ Eliminado de favoritos');
+}
+
+function navigateToFav(idx) {
+  const f = favorites[idx];
+  if (f.type === 'chapter') {
+    currentBook = f.book;
+    currentChapter = f.chapter;
+    navigate('reader');
+  } else {
+    currentBook = f.book;
+    currentChapter = f.chapter;
+    navigate('reader');
+    // Scroll to verse
+    setTimeout(() => {
+      const vEl = document.getElementById(`v-${f.book}-${f.chapter}-${f.verse}`);
+      if (vEl) vEl.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 100);
+  }
+}
+
+function getChapterText(book, chapter) {
+  const chapterData = BIBLE_TEXT[book]?.[chapter];
+  if (!chapterData) return '';
+  return Object.keys(chapterData).sort((a,b)=>parseInt(a)-parseInt(b)).map(verse => `${verse}. ${chapterData[verse]}`).join(' ');
+}
+
+function toggleExpandFav(idx) {
+  const f = favorites[idx];
+  if (f.type === 'chapter') {
+    f.expanded = !f.expanded;
+    if (f.expanded) {
+      f.displayText = getChapterText(f.book, f.chapter);
+    } else {
+      f.displayText = f.text;
+    }
+    saveFavorites();
+    renderFavorites();
+  }
+}
+
+function exportFavorites() {
+  const dataStr = JSON.stringify(favorites, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  const exportFileDefaultName = 'favoritos_biblia.json';
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+  showToast('📤 Favoritos exportados');
+}
+
+function confirmClearFavs() {
+  if (confirm('¿Deseas eliminar todos tus favoritos?')) {
+    favorites = [];
+    saveFavorites();
+    renderFavorites();
+    updateFavBadge();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  FAV HELPERS
+// ═══════════════════════════════════════════════════════
+function toggleFav(book, chapter, verse) {
+  const verseText = BIBLE_TEXT[book]?.[chapter]?.[verse] || '';
+  const ref = `${book} ${chapter}:${verse}`;
+  const existing = favorites.findIndex(f => f.book === book && f.chapter === chapter && f.verse === verse);
+  if (existing >= 0) {
+    favorites.splice(existing, 1);
+    saveFavorites();
+    const btn = document.querySelector(`#v-${book}-${chapter}-${verse} .verse-btn`);
+    if (btn) { btn.textContent = '☆'; btn.classList.remove('faved'); }
+    showToast('✦ Eliminado de favoritos');
+  } else {
+    favorites.push({book, chapter, verse, text: verseText, ref});
+    saveFavorites();
+    const btn = document.querySelector(`#v-${book}-${chapter}-${verse} .verse-btn`);
+    if (btn) { btn.textContent = '★'; btn.classList.add('faved'); }
+    showToast('★ Añadido a favoritos');
+  }
+  updateFavBadge();
+}
+
+function addToFavorites(item) {
+  const existing = favorites.findIndex(f => f.ref === item.ref);
+  if (existing < 0) {
+    favorites.push(item);
+    saveFavorites();
+    showToast('★ Añadido a favoritos');
+    updateFavBadge();
+  } else {
+    showToast('✦ Ya está en favoritos');
+  }
+}
+
+function saveFavorites() {
+  localStorage.setItem('bible_favorites', JSON.stringify(favorites));
+}
+
+function toggleChapterFav() {
+  const existing = favorites.findIndex(f => f.type === 'chapter' && f.book === currentBook && f.chapter === currentChapter);
+  const btn = document.getElementById('chapter-fav-btn');
+  if (existing >= 0) {
+    favorites.splice(existing, 1);
+    saveFavorites();
+    btn.textContent = '☆ Capítulo';
+    btn.classList.remove('faved');
+    showToast('✦ Capítulo eliminado de favoritos');
+  } else {
+    favorites.push({type: 'chapter', book: currentBook, chapter: currentChapter, verse: null, text: `Capítulo ${currentChapter} de ${currentBook}`, ref: `${currentBook} ${currentChapter}`, expanded: false});
+    saveFavorites();
+    btn.textContent = '★ Capítulo';
+    btn.classList.add('faved');
+    showToast('★ Capítulo añadido a favoritos');
+  }
+  updateFavBadge();
+}
+
+function updateFavBadge() {
+  const count = favorites.length;
+  ['fav-bb-btn','fav-bb-btn2','fav-bb-btn3','fav-bb-btn4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const existing = el.querySelector('.fav-badge');
+    if (existing) existing.remove();
+    if (count > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'fav-badge';
+      badge.textContent = count > 99 ? '99+' : count;
+      el.appendChild(badge);
+    }
+  });
+}
+
+function copyVerse(book, chapter, verse) {
+  const text = BIBLE_TEXT[book]?.[chapter]?.[verse] || '';
+  const ref = `${book} ${chapter}:${verse}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(`"${text}" — ${ref}`);
+    showToast('📋 Versículo copiado');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEARCH (improved with full Bible)
+// ═══════════════════════════════════════════════════════
+function showSearch() {
+  const query = prompt('🔍 Buscar versículo (ej: "Juan 3:16" o "amor"):');
+  if (!query) return;
+  const q = query.toLowerCase().trim();
+  
+  // Try to parse as reference   
+  const refMatch = query.match(/^(.+?)\s+(\d+):(\d+)$/i);
+  if (refMatch) {
+    const b = ALL_BOOKS.find(b => b.toLowerCase().includes(refMatch[1].toLowerCase()));
+    if (b) {
+      currentBook = b;
+      currentChapter = parseInt(refMatch[2]);
+      navigate('reader');
+      setTimeout(() => {
+        const vEl = document.getElementById(`v-${b}-${currentChapter}-${refMatch[3]}`);
+        if (vEl) { vEl.style.background='rgba(201,168,76,0.15)'; vEl.scrollIntoView({behavior:'smooth',block:'center'}); }
+      }, 200);
+      return;
+    }
+  }
+  
+  // Búsqueda de texto en toda la Biblia
+  const results = [];
+  if (BIBLE_RAW && BIBLE_RAW.length > 0) {
+    for (const entry of BIBLE_RAW) {
+      if (entry.Text.toLowerCase().includes(q)) {
+        results.push({
+          book: entry.Book,
+          chapter: entry.Chapter,
+          verse: entry.Verse,
+          text: entry.Text
+        });
+        if (results.length >= 20) break;  // Buscar hasta 20 resultados
+      }
+    }
+  }
+  
+  if (results.length > 0) {
+    const first = results[0];
+    currentBook = first.book;
+    currentChapter = first.chapter;
+    navigate('reader');
+    showToast(`✦ ${results.length} resultado(s) encontrado(s) - Mostrando el primero`);
+    setTimeout(() => {
+      const vEl = document.getElementById(`v-${first.book}-${first.chapter}-${first.verse}`);
+      if (vEl) { vEl.style.background='rgba(201,168,76,0.15)'; vEl.scrollIntoView({behavior:'smooth',block:'center'}); }
+    }, 200);
+  } else {
+    alert('No se encontraron resultados para: "' + query + '"');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+updateFavBadge();
+currentDayIndex = new Date().getDay();
+const VOICE_GENDER_PATTERNS = {
+  female: /female|frau|femme|mujer|woman|girl|donna|dame|feminine|mujer|femenina/i,
+  male: /male|man|hombre|boy|hombre|homme|masculine/i
+};
+let voiceRate = 1;
+let availableVoices = [];
+let currentUtterance = null;
+let selectedVoiceIndex = 0;
+
+function initializeVoiceControlsWhenReady() {
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initVoiceControls);
+  } else {
+    initVoiceControls();
+  }
+}
+initializeVoiceControlsWhenReady();
+
+// Cargar Biblia JSON al iniciar
+(async () => {
+  console.log('Iniciando carga de Biblia.json...');
+  const success = await loadBible();
+  if (success) {
+    isBibleLoaded = true;
+    console.log('✓ Biblia cargada exitosamente');
+  } else {
+    console.error('Error: No se pudo cargar Biblia.json');
+    alert('⚠ Error al cargar Biblia.json\n\nVerifica que:\n1. El archivo "Biblia.json" esté en la misma carpeta\n2. Nombrado correctamente (con mayúscula)');
+  }
+})();
+
+function getSpeechSynthesis() {
+  return window.speechSynthesis || window.webkitSpeechSynthesis || null;
+}
+function detectVoiceGender(name) {
+  if (!name) return '';
+  if (VOICE_GENDER_PATTERNS.female.test(name)) return 'Mujer';
+  if (VOICE_GENDER_PATTERNS.male.test(name)) return 'Hombre';
+  return '';
+}
+function populateVoiceList() {
+  const synth = getSpeechSynthesis();
+  const select = document.getElementById('voice-select');
+  if (!select) return;
+  availableVoices = synth ? synth.getVoices() : [];
+  select.innerHTML = '';
+
+  if (availableVoices.length === 0) {
+    const option = document.createElement('option');
+    option.textContent = 'No se encontraron voces disponibles';
+    option.value = '';
+    select.appendChild(option);
+    return;
+  }
+
+  availableVoices.forEach((voice, index) => {
+    const option = document.createElement('option');
+    const gender = detectVoiceGender(voice.name);
+    option.value = index;
+    option.textContent = `${voice.name} (${voice.lang}${gender ? ' - ' + gender : ''})`;
+    select.appendChild(option);
+  });
+  select.value = selectedVoiceIndex;
+}
+
+function setVoiceSpeed(val) {
+  voiceRate = parseFloat(val) || 1;
+  document.getElementById('voice-speed-label').textContent = voiceRate.toFixed(2);
+  if (currentUtterance) {
+    currentUtterance.rate = voiceRate;
+  }
+}
+
+function speakCurrentChapter() {
+  const synth = getSpeechSynthesis();
+  if (!synth) {
+    alert('Tu navegador no soporta la síntesis de voz.');
+    return;
+  }
+  stopSpeech();
+  const text = getChapterText(currentBook, currentChapter);
+  if (!text) {
+    alert('No hay texto disponible para leer.');
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(`${currentBook}, capítulo ${currentChapter}. ${text}`);
+  const voice = availableVoices[selectedVoiceIndex] || availableVoices.find(v => v.default) || availableVoices[0];
+  if (voice) utterance.voice = voice;
+  utterance.rate = voiceRate;
+  utterance.onend = () => { currentUtterance = null; };
+  utterance.onerror = (event) => { console.error('TTS Error:', event.error); };
+  currentUtterance = utterance;
+  synth.speak(utterance);
+}
+
+function pauseSpeech() {
+  const synth = getSpeechSynthesis();
+  if (!synth) return;
+  if (synth.speaking && !synth.paused) {
+    synth.pause();
+  }
+}
+
+function resumeSpeech() {
+  const synth = getSpeechSynthesis();
+  if (!synth) return;
+  if (synth.paused) {
+    synth.resume();
+  }
+}
+
+function stopSpeech() {
+  const synth = getSpeechSynthesis();
+  if (!synth) return;
+  if (synth.speaking || synth.paused) {
+    synth.cancel();
+  }
+  currentUtterance = null;
+}
+
+function toggleVoiceControls() {
+  const controls = document.getElementById('voice-controls');
+  controls.classList.toggle('active');
+}
+
+function initVoiceControls() {
+  const synth = getSpeechSynthesis();
+  if (!synth) {
+    const select = document.getElementById('voice-select');
+    if (select) select.innerHTML = '<option>La síntesis de voz no está disponible</option>';
+    return;
+  }
+  populateVoiceList();
+  synth.onvoiceschanged = populateVoiceList;
+  // Fallback for browsers that load voices asynchronously without firing the event
+  setTimeout(populateVoiceList, 250);
+  setTimeout(populateVoiceList, 1000);
+}
+
+// FONT SIZE CONTROL
+function changeFontSize(val) {
+  const v = parseInt(val) || 16;
+  document.documentElement.style.fontSize = v + 'px';
+  try { localStorage.setItem('bible_font_size', v); } catch(e) {}
+  document.querySelectorAll('select[id^="font-size-select"]').forEach(s => s.value = String(v));
+}
+
+// Initialize font size from localStorage
+(function initFontSize() {
+  const saved = parseInt(localStorage.getItem('bible_font_size')) || 16;
+  changeFontSize(saved);
+})();
+</script>
+</body>
+</html>
