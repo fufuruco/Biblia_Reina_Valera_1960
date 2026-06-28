@@ -533,7 +533,12 @@
         <div class="home-card-sub">Devocional del día</div>
       </div>
       <div class="home-card" onclick="navigate('special')">
-        <div class="home-card-icon">�</div>
+        <div class="home-card-icon">💛</div>
+        <div class="home-card-title">Especial</div>
+        <div class="home-card-sub">Versículos de consuelo</div>
+      </div>
+      <div class="home-card" onclick="navigate('study')">
+        <div class="home-card-icon">📚</div>
         <div class="home-card-title">Estudios Bíblicos</div>
         <div class="home-card-sub">24 temas para un estudio profundo</div>
       </div>
@@ -550,6 +555,7 @@
     <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
     <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
     <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('study')"><span class="bb-icon">📚</span>Estudio Bíblico</button>
     <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn"><span class="bb-icon">⭐</span>Favoritos</button>
   </div>
 </div>
@@ -592,6 +598,7 @@
     <button class="bb-btn active" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
     <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
     <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('study')"><span class="bb-icon">📚</span>Estudio Bíblico</button>
     <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn2"><span class="bb-icon">⭐</span>Favoritos</button>
   </div>
 </div>
@@ -619,6 +626,7 @@
     <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
     <button class="bb-btn active" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
     <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('study')"><span class="bb-icon">📚</span>Estudio Bíblico</button>
     <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn3"><span class="bb-icon">⭐</span>Favoritos</button>
   </div>
 </div>
@@ -628,14 +636,14 @@
   <div class="top-nav">
     <div class="nav-logo">
       <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
-      <span class="nav-logo-cross">�</span>
-      <span class="nav-logo-title">Estudios Bíblicos</span>
+      <span class="nav-logo-cross">💛</span>
+      <span class="nav-logo-title">Especial</span>
     </div>
   </div>
   <div class="content">
     <div class="special-header">
-      <h1>Temas de estudio bíblico</h1>
-      <p>Explora 24 lecciones profundas con guía práctica y lecturas clave</p>
+      <h1>Versículos de consuelo</h1>
+      <p>Encuentra alivio en la Palabra para cuando te sientas triste, enfermo, aburrido, enojado, solo o deprimido.</p>
     </div>
     <div id="special-cards"></div>
     <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
@@ -645,7 +653,35 @@
     <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
     <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
     <button class="bb-btn active" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('study')"><span class="bb-icon">📚</span>Estudio Bíblico</button>
     <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn4"><span class="bb-icon">⭐</span>Favoritos</button>
+  </div>
+</div>
+
+<!-- ═══════════ STUDY ═══════════ -->
+<div id="view-study" class="view">
+  <div class="top-nav">
+    <div class="nav-logo">
+      <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
+      <span class="nav-logo-cross">📚</span>
+      <span class="nav-logo-title">Estudios Bíblicos</span>
+    </div>
+  </div>
+  <div class="content">
+    <div class="special-header">
+      <h1>Temas de estudio bíblico</h1>
+      <p>Explora 24 lecciones profundas con guía práctica y lecturas clave.</p>
+    </div>
+    <div id="study-cards"></div>
+    <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
+  </div>
+  <div class="bottom-bar">
+    <button class="bb-btn" onclick="navigate('home')"><span class="bb-icon">🏠</span>Inicio</button>
+    <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
+    <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
+    <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn active" onclick="navigate('study')"><span class="bb-icon">📚</span>Estudio Bíblico</button>
+    <button class="bb-btn" onclick="navigate('favorites')" id="fav-bb-btn5"><span class="bb-icon">⭐</span>Favoritos</button>
   </div>
 </div>
 
@@ -671,6 +707,7 @@
     <button class="bb-btn" onclick="navigate('reader')"><span class="bb-icon">📖</span>Biblia</button>
     <button class="bb-btn" onclick="navigate('daily')"><span class="bb-icon">🌅</span>Diario</button>
     <button class="bb-btn" onclick="navigate('special')"><span class="bb-icon">🙏</span>Especial</button>
+    <button class="bb-btn" onclick="navigate('study')"><span class="bb-icon">📚</span>Estudio Bíblico</button>
     <button class="bb-btn active" onclick="navigate('favorites')"><span class="bb-icon">⭐</span>Favoritos</button>
   </div>
 </div>
@@ -1265,6 +1302,7 @@ function navigate(view) {
   if (view === 'reader') renderReader();
   if (view === 'daily') renderDaily();
   if (view === 'special') renderSpecial();
+  if (view === 'study') renderStudy();
   if (view === 'favorites') renderFavorites();
   updateFavBadge();
   document.getElementById('view-' + view).querySelector('.content')?.scrollTo(0,0);
@@ -1588,6 +1626,35 @@ function updateThemeButton() {
 // ═══════════════════════════════════════════════════════
 function renderSpecial() {
   const container = document.getElementById('special-cards');
+  container.innerHTML = SPECIAL_COMFORT.map(cat => `
+    <div class="special-card" id="sc-${cat.id}">
+      <div class="special-card-header" onclick="toggleSpecial('${cat.id}')">
+        <div class="special-icon">${cat.icon}</div>
+        <div class="special-card-info">
+          <div class="special-card-title">${cat.title}</div>
+          <div class="special-card-desc">${cat.desc}</div>
+        </div>
+        <div class="special-chevron">▼</div>
+      </div>
+      <div class="special-verses">
+        ${cat.verses.map((v,i) => `
+          <div class="sv-item">
+            <div style="flex:1">
+              <div class="sv-text">"${v.text}"</div>
+              <span class="sv-ref">— ${v.ref}</span>
+            </div>
+            <button class="sv-fav ${favorites.some(f=>f.ref===v.ref)?'faved':''}"
+              id="svf-${cat.id}-${i}"
+              onclick="toggleSpecialFav('${cat.id}',${i})">★</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderStudy() {
+  const container = document.getElementById('study-cards');
   container.innerHTML = SPECIAL_READINGS.map(cat => `
     <div class="special-card" id="sc-${cat.id}">
       <div class="special-card-header" onclick="toggleSpecial('${cat.id}')">
@@ -1621,7 +1688,7 @@ function toggleSpecial(id) {
 }
 
 function toggleSpecialFav(catId, idx) {
-  const cat = SPECIAL_READINGS.find(c => c.id === catId);
+  const cat = SPECIAL_READINGS.find(c => c.id === catId) || SPECIAL_COMFORT.find(c => c.id === catId);
   const v = cat.verses[idx];
   const btn = document.getElementById(`svf-${catId}-${idx}`);
   const existing = favorites.findIndex(f => f.ref === v.ref);
