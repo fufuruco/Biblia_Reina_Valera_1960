@@ -217,7 +217,7 @@
   }
   .notification-card-title { color:var(--gold); font-weight:bold; letter-spacing:0.08em; }
   .notification-card-text { color:var(--text-light); font-size:0.9rem; line-height:1.4; }
-  .notify-btn {
+  .notify-btn, .theme-btn {
     background:var(--gold);
     color:var(--dark);
     border:none;
@@ -229,7 +229,15 @@
     font-weight:bold;
     align-self:flex-start;
   }
-  .notify-btn:hover { background:var(--gold-dark); }
+  .notify-btn:hover, .theme-btn:hover { background:var(--gold-dark); }
+  .theme-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(141,121,66,0.08));
+    border:1px solid rgba(201,168,76,0.25);
+    border-radius:10px; padding:18px 18px 16px; margin-bottom:18px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .theme-card-title { color:var(--gold); font-weight:bold; letter-spacing:0.08em; }
+  .theme-card-text { color:var(--text-light); font-size:0.9rem; line-height:1.4; }
   .daily-verse-card {
     background: linear-gradient(135deg, #1a0f02, #2d1e08);
     border:1px solid var(--gold-dark);
@@ -504,6 +512,11 @@
       <div class="notification-card-text">Activa un versículo inspirador cada hora mientras la app está abierta.</div>
       <button class="notify-btn" id="notify-btn" onclick="initVerseNotifications()">Activar notificaciones</button>
     </div>
+    <div class="theme-card">
+      <div class="theme-card-title">🎨 Tema visual</div>
+      <div class="theme-card-text">Elige entre modo claro y oscuro para leer con más calma.</div>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">Activar tema oscuro</button>
+    </div>
     <div class="home-header">
       <h1>¿Qué deseas explorar?</h1>
       <p>Selecciona una sección para comenzar</p>
@@ -520,9 +533,9 @@
         <div class="home-card-sub">Devocional del día</div>
       </div>
       <div class="home-card" onclick="navigate('special')">
-        <div class="home-card-icon">🙏</div>
-        <div class="home-card-title">Lecturas Especiales</div>
-        <div class="home-card-sub">Para cada momento</div>
+        <div class="home-card-icon">�</div>
+        <div class="home-card-title">Estudios Bíblicos</div>
+        <div class="home-card-sub">24 temas para un estudio profundo</div>
       </div>
       <div class="home-card" onclick="navigate('favorites')">
         <div class="home-card-icon">⭐</div>
@@ -615,14 +628,14 @@
   <div class="top-nav">
     <div class="nav-logo">
       <button class="nav-icon-btn" onclick="navigate('home')">◀</button>
-      <span class="nav-logo-cross">🙏</span>
-      <span class="nav-logo-title">Lecturas Especiales</span>
+      <span class="nav-logo-cross">�</span>
+      <span class="nav-logo-title">Estudios Bíblicos</span>
     </div>
   </div>
   <div class="content">
     <div class="special-header">
-      <h1>Para cada momento</h1>
-      <p>Dios tiene una palabra especial para ti hoy</p>
+      <h1>Temas de estudio bíblico</h1>
+      <p>Explora 24 lecciones profundas con guía práctica y lecturas clave</p>
     </div>
     <div id="special-cards"></div>
     <div style="text-align:center; padding: 40px 0 80px 0; color:var(--gold-dark); font-size:0.8rem; opacity:0.8; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;">By Jorge Pereira</div>
@@ -828,181 +841,294 @@ async function loadBible() {
 // ═══════════════════════════════════════════════════════
 const SPECIAL_READINGS = [
   {
-    id:"triste", icon:"🌧️", color:"#1a3a6b",
-    title:"Cuando estés triste",
-    desc:"Dios sana los corazones quebrantados",
+    id:"pentateuco", icon:"📜", color:"#5c4033",
+    title:"Pentateuco: Origen y pacto",
+    desc:"Estudio del inicio de la historia y del pacto con Abraham",
     verses:[
-      {text:"El Señor está cerca de los quebrantados de corazón; y salva a los contritos de espíritu.", ref:"Salmos 34:18"},
-      {text:"Bienaventurados los que lloran, porque ellos recibirán consolación.", ref:"Mateo 5:4"},
-      {text:"¿Por qué te abates, oh alma mía, y por qué te turbas dentro de mí? Espera en Dios; porque aún he de alabarle, Salvación mía y Dios mío.", ref:"Salmos 42:11"},
-      {text:"Él sana a los quebrantados de corazón, y venda sus heridas.", ref:"Salmos 147:3"},
-      {text:"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.", ref:"Mateo 11:28"},
-      {text:"Enjugará Dios toda lágrima de los ojos de ellos; y ya no habrá muerte, ni habrá más llanto, ni clamor, ni dolor.", ref:"Apocalipsis 21:4"},
-      {text:"Me ha enviado a sanar a los quebrantados de corazón; a pregonar libertad a los cautivos, y apertura de la cárcel a los presos.", ref:"Isaías 61:1"},
-      {text:"Por la noche durará el lloro, y a la mañana vendrá la alegría.", ref:"Salmos 30:5b"},
-      {text:"Los que sembraron con lágrimas, con regocijo segarán.", ref:"Salmos 126:5"}
+      {text:"En el principio Dios creó los cielos y la tierra.", ref:"Génesis 1:1"},
+      {text:"Yo seré con él; y este será a mí por padre, y yo le seré a él por hijo.", ref:"Génesis 17:7"},
+      {text:"Yo soy el Señor tu Dios, que te saqué de la tierra de Egipto.", ref:"Éxodo 20:2"},
+      {text:"Amarás al Señor tu Dios con todo tu corazón.", ref:"Deuteronomio 6:5"},
+      {text:"Escucha, Israel: Jehová nuestro Dios, Jehová uno es.", ref:"Deuteronomio 6:4"}
     ]
   },
   {
-    id:"animo", icon:"💪", color:"#1a5c2a",
-    title:"Cuando necesites ánimo",
-    desc:"Fuerzas renovadas en el Señor",
+    id:"evangelios", icon:"✝️", color:"#842121",
+    title:"Evangelios: El anuncio del reino",
+    desc:"Profundiza en el mensaje, los milagros y las enseñanzas de Jesús",
     verses:[
+      {text:"Bienaventurados los pobres en espíritu, porque de ellos es el reino de los cielos.", ref:"Mateo 5:3"},
+      {text:"El que come mi carne y bebe mi sangre, permanece en mí, y yo en él.", ref:"Juan 6:56"},
+      {text:"El Hijo del Hombre no vino para ser servido, sino para servir.", ref:"Marcos 10:45"},
+      {text:"Yo soy la luz del mundo.", ref:"Juan 8:12"},
+      {text:"Id por todo el mundo y predicad el evangelio a toda criatura.", ref:"Marcos 16:15"}
+    ]
+  },
+  {
+    id:"salmos", icon:"🎵", color:"#3a5c3a",
+    title:"Salmos: Alabanza y clamor",
+    desc:"Eleva tu voz en adoración, arrepentimiento y confianza",
+    verses:[
+      {text:"Jehová es mi pastor; nada me faltará.", ref:"Salmos 23:1"},
+      {text:"Alabad a Jehová, porque él es bueno; porque para siempre es su misericordia.", ref:"Salmos 136:1"},
+      {text:"Crea en mí, oh Dios, un corazón limpio.", ref:"Salmos 51:10"},
+      {text:"Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref:"Salmos 119:105"},
+      {text:"Bendice, alma mía, a Jehová, y no olvides ninguno de sus beneficios.", ref:"Salmos 103:2"}
+    ]
+  },
+  {
+    id:"proverbios", icon:"💡", color:"#7f5a20",
+    title:"Proverbios: Sabiduría para la vida",
+    desc:"Consejos prácticos para el hogar, el trabajo y la fe",
+    verses:[
+      {text:"El principio de la sabiduría es el temor de Jehová.", ref:"Proverbios 9:10"},
+      {text:"Confía en Jehová con todo tu corazón.", ref:"Proverbios 3:5-6"},
+      {text:"El que guarda su boca y su lengua, su alma guarda de angustias.", ref:"Proverbios 21:23"},
+      {text:"Mejor es lo poco con justicia, que grandes ingresos sin derecho.", ref:"Proverbios 16:8"},
+      {text:"Instruye al niño en su camino.", ref:"Proverbios 22:6"}
+    ]
+  },
+  {
+    id:"historia", icon:"🏛️", color:"#4a3a1e",
+    title:"Historia de Israel",
+    desc:"Desde la conquista de Canaán hasta el exilio y la restauración",
+    verses:[
+      {text:"Escoge hoy a quién servirás.", ref:"Josué 24:15"},
+      {text:"Jehová salvó con su mano poderosa.", ref:"1 Samuel 17:47"},
+      {text:"Israel pecó y fue llevado al cautiverio.", ref:"2 Reyes 17:7-8"},
+      {text:"Esdras se entregó a estudiar y a practicar la ley del Señor.", ref:"Esdras 7:10"},
+      {text:"El gozo del Señor es vuestra fuerza.", ref:"Nehemías 8:10"}
+    ]
+  },
+  {
+    id:"reyes", icon:"👑", color:"#51312b",
+    title:"Reyes y Crónicas",
+    desc:"Liderazgo, fidelidad y las consecuencias del pecado real",
+    verses:[
+      {text:"Jehová estuvo con David dondequiera que él fue.", ref:"1 Samuel 18:14"},
+      {text:"Dame, pues, sabiduría y conocimiento para gobernar.", ref:"1 Reyes 3:9"},
+      {text:"El rey se humilló y buscó al Señor.", ref:"2 Crónicas 33:12"},
+      {text:"Un vástago saldrá de la raíz de Isaí.", ref:"Isaías 11:1"},
+      {text:"El reino justo hará justicia.", ref:"Salmos 72:1"}
+    ]
+  },
+  {
+    id:"profetas_mayores", icon:"📣", color:"#342f58",
+    title:"Profetas Mayores",
+    desc:"Advertencias, castigo, restauración y la esperanza mesiánica",
+    verses:[
+      {text:"Venid luego, dice Jehová, y estemos a cuenta.", ref:"Isaías 1:18"},
+      {text:"Buscaréis a mí y me hallaréis.", ref:"Jeremías 29:13"},
+      {text:"El misericordioso amor del Señor nunca se acaba.", ref:"Lamentaciones 3:22-23"},
+      {text:"Dios dará un nuevo corazón y un espíritu nuevo.", ref:"Ezequiel 36:26-27"},
+      {text:"Su reino es eterno y no será destruido.", ref:"Daniel 7:14"}
+    ]
+  },
+  {
+    id:"profetas_menores", icon:"📜", color:"#4d4726",
+    title:"Profetas Menores",
+    desc:"Mensajes breves para el arrepentimiento y la restauración",
+    verses:[
+      {text:"Quiero misericordia y no sacrificio.", ref:"Oseas 6:6"},
+      {text:"Derramaré mi Espíritu sobre toda carne.", ref:"Joel 2:28-29"},
+      {text:"Buscad lo bueno y no lo malo.", ref:"Amós 5:14"},
+      {text:"El justo por la fe vivirá.", ref:"Habacuc 2:4"},
+      {text:"He aquí, yo envío mi mensajero; preparad el camino.", ref:"Malaquías 3:1"}
+    ]
+  },
+  {
+    id:"isaías_mesiánico", icon:"🌿", color:"#2a4a50",
+    title:"Isaías mesiánico",
+    desc:"Profecías que señalan al Salvador y su obra redentora",
+    verses:[
+      {text:"He aquí que la virgen concebirá y dará a luz un hijo.", ref:"Isaías 7:14"},
+      {text:"Se nos ha nacido un niño, y el principado sobre su hombro.", ref:"Isaías 9:6"},
+      {text:"Ciertamente llevó él nuestras enfermedades.", ref:"Isaías 53:4"},
+      {text:"El Espíritu del Señor está sobre mí para predicar buenas nuevas.", ref:"Isaías 61:1"},
+      {text:"Del fruto de sus labios juzgará con rectitud.", ref:"Isaías 11:3-4"}
+    ]
+  },
+  {
+    id:"juan", icon:"📖", color:"#2e4b6a",
+    title:"Evangelio de Juan",
+    desc:"Conoce al Verbo eterno que vino a dar vida a los hombres",
+    verses:[
+      {text:"En el principio era el Verbo, y el Verbo era con Dios.", ref:"Juan 1:1"},
+      {text:"Yo soy la resurrección y la vida.", ref:"Juan 11:25"},
+      {text:"El que cree en mí, aunque esté muerto, vivirá.", ref:"Juan 11:25"},
+      {text:"Porque de tal manera amó Dios al mundo.", ref:"Juan 3:16"},
+      {text:"He venido para que tengan vida, y para que la tengan en abundancia.", ref:"Juan 10:10"}
+    ]
+  },
+  {
+    id:"romanos", icon:"🕊️", color:"#5c2e32",
+    title:"Romanos: Justicia por la fe",
+    desc:"El fundamento de la salvación y la vida nueva en Cristo",
+    verses:[
+      {text:"Soy no avergonzado del evangelio.", ref:"Romanos 1:16"},
+      {text:"Todos pecaron y están destituidos de la gloria de Dios.", ref:"Romanos 3:23"},
+      {text:"Justificados por su gracia mediante la redención en Cristo Jesús.", ref:"Romanos 3:24"},
+      {text:"Dios muestra su amor, en que Cristo murió por nosotros.", ref:"Romanos 5:8"},
+      {text:"Ahora ninguna condenación hay para los que están en Cristo Jesús.", ref:"Romanos 8:1"}
+    ]
+  },
+  {
+    id:"corintios", icon:"🤝", color:"#3e444e",
+    title:"Corintios: Iglesia y amor",
+    desc:"Unidad, dones y el amor que edifica al cuerpo de Cristo",
+    verses:[
+      {text:"Si no tengo amor, nada soy.", ref:"1 Corintios 13:2"},
+      {text:"El amor todo lo sufre, todo lo cree, todo lo espera.", ref:"1 Corintios 13:7"},
+      {text:"En el cuerpo hay diversidad de miembros.", ref:"1 Corintios 12:14"},
+      {text:"El que es de Dios oye las palabras de Dios.", ref:"Juan 8:47"},
+      {text:"Velad, estad firmes en la fe.", ref:"1 Corintios 16:13"}
+    ]
+  },
+  {
+    id:"galatas", icon:"🕊️", color:"#2f5346",
+    title:"Gálatas: Libertad en Cristo",
+    desc:"Vive guiado por el Espíritu y libre del yugo de la carne",
+    verses:[
+      {text:"Estad firmes, y no os sujetéis otra vez al yugo de esclavitud.", ref:"Gálatas 5:1"},
+      {text:"Con Cristo estoy juntamente crucificado.", ref:"Gálatas 2:20"},
+      {text:"El fruto del Espíritu es amor, gozo, paz, paciencia.", ref:"Gálatas 5:22"},
+      {text:"Si andamos en el Espíritu, no satisfagamos los deseos de la carne.", ref:"Gálatas 5:16"},
+      {text:"De ninguna manera aborrezco la gracia de Dios.", ref:"Gálatas 5:4"}
+    ]
+  },
+  {
+    id:"efesios", icon:"🏺", color:"#424b5d",
+    title:"Efesios: Cuerpo de Cristo",
+    desc:"Identidad, unidad y la armadura espiritual para el creyente",
+    verses:[
+      {text:"Bendito sea el Dios y Padre de nuestro Señor Jesucristo.", ref:"Efesios 1:3"},
+      {text:"Por gracia sois salvos por medio de la fe.", ref:"Efesios 2:8"},
+      {text:"Andad como hijos de luz.", ref:"Efesios 5:8"},
+      {text:"Vestíos de amor, que es el vínculo perfecto.", ref:"Efesios 4:2-3"},
+      {text:"Vestíos con toda la armadura de Dios.", ref:"Efesios 6:11"}
+    ]
+  },
+  {
+    id:"filipenses", icon:"😊", color:"#4d3c2a",
+    title:"Filipenses: Gozo en la prueba",
+    desc:"Mantén la esperanza y la gratitud aun en dificultades",
+    verses:[
+      {text:"Regocijaos en el Señor siempre.", ref:"Filipenses 4:4"},
+      {text:"Por nada estéis afanosos.", ref:"Filipenses 4:6"},
       {text:"Todo lo puedo en Cristo que me fortalece.", ref:"Filipenses 4:13"},
-      {text:"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.", ref:"Isaías 41:10"},
-      {text:"Los que esperan a Jehová tendrán nuevas fuerzas; levantarán alas como las águilas; correrán, y no se cansarán; caminarán, y no se fatigarán.", ref:"Isaías 40:31"},
-      {text:"Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo en dondequiera que vayas.", ref:"Josué 1:9"},
-      {text:"Esfuérzate y sé valiente; no temas ni te acobardes, porque Jehová tu Dios estará contigo.", ref:"Josué 1:9b"},
-      {text:"¿No te lo he mandado yo? Esfuérzate y sé valiente; no temas ni desmayes.", ref:"Josué 1:9a"},
-      {text:"El Señor es mi luz y mi salvación; ¿a quién temeré? Jehová es la fortaleza de mi vida; ¿de quién me he de atemorizar?", ref:"Salmos 27:1"},
-      {text:"Él da esfuerzo al cansado, y multiplica las fuerzas al que no tiene ningunas.", ref:"Isaías 40:29"},
-      {text:"Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien.", ref:"Romanos 8:28"}
+      {text:"No hagáis nada por contienda o por vanagloria.", ref:"Filipenses 2:3"},
+      {text:"Para mí el vivir es Cristo.", ref:"Filipenses 1:21"}
     ]
   },
   {
-    id:"miedo", icon:"😨", color:"#4a1a6b",
-    title:"Cuando tengas miedo",
-    desc:"El perfecto amor echa fuera el temor",
+    id:"colosenses", icon:"🌱", color:"#3f5a3b",
+    title:"Colosenses: Cristo supremo",
+    desc:"La suficiencia de Cristo sobre toda doctrina y práctica",
     verses:[
-      {text:"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios. Siempre te ayudaré, siempre te sustentaré.", ref:"Isaías 41:10"},
-      {text:"El que habita al abrigo del Altísimo morará bajo la sombra del Omnipotente.", ref:"Salmos 91:1"},
-      {text:"Pues a sus ángeles mandará acerca de ti, que te guarden en todos tus caminos.", ref:"Salmos 91:11"},
-      {text:"En el amor no hay temor, sino que el perfecto amor echa fuera el temor.", ref:"1 Juan 4:18"},
-      {text:"No os he dado espíritu de cobardía, sino de poder, de amor y de dominio propio.", ref:"2 Timoteo 1:7"},
-      {text:"No se turbe vuestro corazón, ni tenga miedo.", ref:"Juan 14:27b"},
-      {text:"Jehová es mi luz y mi salvación; ¿a quién temeré?", ref:"Salmos 27:1"},
-      {text:"Aunque ande en valle de sombra de muerte, no temeré mal alguno, porque tú estarás conmigo.", ref:"Salmos 23:4"},
-      {text:"Jehová te guardará de todo mal; él guardará tu alma.", ref:"Salmos 121:7"},
-      {text:"Cuando pases por las aguas, yo estaré contigo; y si por los ríos, no te anegarán.", ref:"Isaías 43:2"}
+      {text:"Él es la imagen del Dios invisible.", ref:"Colosenses 1:15"},
+      {text:"En él habita corporalmente toda la plenitud de la Deidad.", ref:"Colosenses 2:9"},
+      {text:"Buscar las cosas de arriba.", ref:"Colosenses 3:1"},
+      {text:"Vestíos de compasión, humildad y paciencia.", ref:"Colosenses 3:12"},
+      {text:"Perseverad en la oración.", ref:"Colosenses 4:2"}
     ]
   },
   {
-    id:"maltrato", icon:"💔", color:"#8b1a1a",
-    title:"Cuando te traten mal",
-    desc:"Dios pelea tus batallas",
+    id:"hebreos", icon:"📖", color:"#2a2a4c",
+    title:"Hebreos: Nuevo pacto en Cristo",
+    desc:"Cristo como Sumo Sacerdote y mediador de una alianza superior",
     verses:[
-      {text:"Amad a vuestros enemigos, bendecid a los que os maldicen, haced bien a los que os aborrecen, y orad por los que os ultrajan y os persiguen.", ref:"Mateo 5:44"},
-      {text:"Bienaventurados sois cuando por mi causa os vituperen y os persigan; gozaos y alegraos, porque vuestro galardón es grande en los cielos.", ref:"Mateo 5:11-12"},
-      {text:"No os venguéis vosotros mismos, amados míos, sino dejad lugar a la ira de Dios; porque escrito está: Mía es la venganza, yo pagaré, dice el Señor.", ref:"Romanos 12:19"},
-      {text:"No seas vencido de lo malo, sino vence con el bien el mal.", ref:"Romanos 12:21"},
-      {text:"Bendecid a los que os persiguen; bendecid, y no maldigáis.", ref:"Romanos 12:14"},
-      {text:"Así que, si tu enemigo tuviere hambre, dale de comer; si tuviere sed, dale de beber.", ref:"Romanos 12:20"},
-      {text:"Porque yo Jehová soy tu Dios, quien te sostiene de tu mano derecha, y te dice: No temas, yo te ayudo.", ref:"Isaías 41:13"},
-      {text:"Nadie tiene mayor amor que este, que uno ponga su vida por sus amigos.", ref:"Juan 15:13"},
-      {text:"Si Dios es por nosotros, ¿quién contra nosotros?", ref:"Romanos 8:31"}
+      {text:"Tenemos un gran sumo sacerdote que se compadece de nuestras debilidades.", ref:"Hebreos 4:15"},
+      {text:"Cristo entró en el Santísimo con su propia sangre.", ref:"Hebreos 9:12"},
+      {text:"Tengamos firme la profesión de nuestra esperanza.", ref:"Hebreos 10:23"},
+      {text:"La fe es la certeza de lo que se espera.", ref:"Hebreos 11:1"},
+      {text:"Corramos con paciencia la carrera que tenemos por delante.", ref:"Hebreos 12:1"}
     ]
   },
   {
-    id:"ansiedad", icon:"😰", color:"#1a4a4a",
-    title:"Cuando estés ansioso",
-    desc:"La paz de Dios que sobrepasa el entendimiento",
+    id:"santiago", icon:"✍️", color:"#5b3e28",
+    title:"Santiago: Fe que actúa",
+    desc:"Una fe viva se demuestra en obras, control de la lengua y oración",
     verses:[
-      {text:"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias. Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones.", ref:"Filipenses 4:6-7"},
-      {text:"Echando toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.", ref:"1 Pedro 5:7"},
-      {text:"No os afanéis por vuestra vida... ¿No es la vida más que el alimento, y el cuerpo más que el vestido?", ref:"Mateo 6:25"},
-      {text:"Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", ref:"Mateo 6:33"},
-      {text:"La paz os dejo, mi paz os doy; yo no os la doy como el mundo la da. No se turbe vuestro corazón, ni tenga miedo.", ref:"Juan 14:27"},
-      {text:"Confiad en Jehová con todo vuestro corazón, y no os apoyéis en vuestra propia prudencia.", ref:"Proverbios 3:5"},
-      {text:"Cuando te acuestes, no tendrás temor, sino que te acostarás, y tu sueño será grato.", ref:"Proverbios 3:24"},
-      {text:"Regocijaos en el Señor siempre. Otra vez digo: ¡Regocijaos!", ref:"Filipenses 4:4"},
-      {text:"Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.", ref:"Salmos 46:1"}
+      {text:"Si alguno tiene falta de sabiduría, pídala a Dios.", ref:"Santiago 1:5"},
+      {text:"Sed hacedores de la palabra, y no tan solamente oidores.", ref:"Santiago 1:22"},
+      {text:"La fe sin obras es muerta.", ref:"Santiago 2:17"},
+      {text:"Someteos a Dios; resistid al diablo.", ref:"Santiago 4:7"},
+      {text:"Orad unos por otros.", ref:"Santiago 5:16"}
     ]
   },
   {
-    id:"perdon", icon:"🕊️", color:"#5c3d1e",
-    title:"Cuando necesites perdón",
-    desc:"La misericordia de Dios es nueva cada mañana",
+    id:"vida_cristiana", icon:"🌿", color:"#37523c",
+    title:"Vida cristiana práctica",
+    desc:"Frutos del Espíritu y una conducta transformada por la Palabra",
     verses:[
-      {text:"Si confesamos nuestros pecados, él es fiel y justo para perdonar nuestros pecados, y limpiarnos de toda maldad.", ref:"1 Juan 1:9"},
-      {text:"Cuanto está lejos el oriente del occidente, hizo alejar de nosotros nuestras rebeliones.", ref:"Salmos 103:12"},
-      {text:"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref:"Juan 3:16"},
-      {text:"Ahora, pues, ninguna condenación hay para los que están en Cristo Jesús.", ref:"Romanos 8:1"},
-      {text:"Él es quien perdona todas tus iniquidades, el que sana todas tus dolencias.", ref:"Salmos 103:3"},
-      {text:"Misericordioso y clemente es Jehová; lento para la ira, y grande en misericordia.", ref:"Salmos 103:8"},
-      {text:"No ha hecho con nosotros conforme a nuestras iniquidades, ni nos ha pagado conforme a nuestros pecados.", ref:"Salmos 103:10"},
-      {text:"El sacrificio de Dios es el espíritu quebrantado; al corazón contrito y humillado no despreciarás tú, oh Dios.", ref:"Salmos 51:17"},
-      {text:"Venid luego, dice Jehová, y estemos a cuenta: si vuestros pecados fueren como la grana, como la nieve serán emblanquecidos.", ref:"Isaías 1:18"}
+      {text:"El fruto del Espíritu es amor, gozo, paz.", ref:"Gálatas 5:22"},
+      {text:"No os conforméis a este mundo.", ref:"Romanos 12:2"},
+      {text:"Amad a vuestros enemigos.", ref:"Mateo 5:44"},
+      {text:"Aborreciendo lo malo, seguid lo bueno.", ref:"Romanos 12:9"},
+      {text:"Vestíos del Señor Jesucristo.", ref:"Romanos 13:14"}
     ]
   },
   {
-    id:"sabiduria", icon:"🌟", color:"#5c4a0e",
-    title:"Cuando necesites sabiduría",
-    desc:"Pide a Dios y Él dará abundantemente",
+    id:"oracion", icon:"🙏", color:"#3b4a57",
+    title:"Oración y comunión",
+    desc:"Modelos de oración y promesas de respuesta para tu vida diaria",
     verses:[
-      {text:"Si alguno de vosotros tiene falta de sabiduría, pídala a Dios, el cual da a todos abundantemente y sin reproche, y le será dada.", ref:"Santiago 1:5"},
-      {text:"Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.", ref:"Proverbios 3:5-6"},
-      {text:"El principio de la sabiduría es el temor de Jehová; los que practican sus mandamientos tienen buen entendimiento.", ref:"Salmos 111:10"},
-      {text:"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal.", ref:"Jeremías 29:11"},
-      {text:"Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref:"Salmos 119:105"},
-      {text:"Bienaventurado el hombre que halla la sabiduría, y que obtiene la inteligencia.", ref:"Proverbios 3:13"},
-      {text:"Toda la Escritura es inspirada por Dios, y útil para enseñar, para redargüir, para corregir, para instruir en justicia.", ref:"2 Timoteo 3:16"},
-      {text:"Porque Jehová da la sabiduría, y de su boca viene el conocimiento y la inteligencia.", ref:"Proverbios 2:6"}
+      {text:"Padre nuestro que estás en los cielos.", ref:"Mateo 6:9"},
+      {text:"Pedid, y se os dará; buscad, y hallaréis.", ref:"Mateo 7:7"},
+      {text:"Orad sin cesar.", ref:"1 Tesalonicenses 5:17"},
+      {text:"Echando toda vuestra ansiedad sobre él.", ref:"1 Pedro 5:7"},
+      {text:"Orad unos por otros.", ref:"Santiago 5:16"}
     ]
   },
   {
-    id:"solo", icon:"🕯️", color:"#2a1f5c",
-    title:"Cuando estés solo",
-    desc:"Nunca te dejará ni te abandonará",
+    id:"adoracion", icon:"🎚️", color:"#523a27",
+    title:"Adoración y alabanza",
+    desc:"Rendirle honor a Dios en espíritu y en verdad",
     verses:[
-      {text:"Sean vuestras costumbres sin avaricia, contentos con lo que tenéis ahora; porque él dijo: No te desampararé, ni te dejaré.", ref:"Hebreos 13:5"},
-      {text:"¿A dónde me iré de tu Espíritu? ¿Y a dónde huiré de tu presencia? Si subiere a los cielos, allí estás tú.", ref:"Salmos 139:7-8"},
-      {text:"Oh Jehová, tú me has examinado y conocido. Tú has conocido mi sentarme y mi levantarme.", ref:"Salmos 139:1-2"},
-      {text:"Yo estoy con vosotros todos los días, hasta el fin del mundo.", ref:"Mateo 28:20"},
-      {text:"Y he aquí, yo estoy con vosotros todos los días, hasta el fin del mundo. Amén.", ref:"Mateo 28:20"},
-      {text:"Porque él dijo: No te desampararé, ni te dejaré; de manera que podemos decir confiadamente: El Señor es mi ayudador.", ref:"Hebreos 13:5-6"},
-      {text:"Aunque mi padre y mi madre me dejaran, con todo, Jehová me recogerá.", ref:"Salmos 27:10"},
-      {text:"Estad quietos, y conoced que yo soy Dios.", ref:"Salmos 46:10"},
-      {text:"Mi socorro viene de Jehová, que hizo los cielos y la tierra.", ref:"Salmos 121:2"}
+      {text:"Entrad por sus puertas con acción de gracias.", ref:"Salmos 100:4"},
+      {text:"Dios habita en la alabanza de su pueblo.", ref:"Salmos 22:3"},
+      {text:"Cantad a Jehová cántico nuevo.", ref:"Salmos 96:1"},
+      {text:"Alabad al Señor por sus obras maravillosas.", ref:"Salmos 145:3"},
+      {text:"Adorad con reverencia y gozo.", ref:"Hebreos 12:28"}
     ]
   },
   {
-    id:"enfermedad", icon:"🤒", color:"#1a3a1a",
-    title:"Cuando estés enfermo",
-    desc:"Jehová te sanará y restaurará",
+    id:"justicia", icon:"⚖️", color:"#243a45",
+    title:"Justicia y misericordia",
+    desc:"El llamado de Dios a amar al prójimo y defender al oprimido",
     verses:[
-      {text:"Él es quien perdona todas tus iniquidades, el que sana todas tus dolencias; el que rescata del hoyo tu vida.", ref:"Salmos 103:3-4"},
-      {text:"¿Está alguno enfermo entre vosotros? Llame a los ancianos de la iglesia, y oren por él, ungiéndole con aceite en el nombre del Señor.", ref:"Santiago 5:14"},
-      {text:"Y la oración de fe salvará al enfermo, y el Señor lo levantará; y si hubiere cometido pecados, le serán perdonados.", ref:"Santiago 5:15"},
-      {text:"Ciertamente llevó él nuestras enfermedades, y sufrió nuestros dolores.", ref:"Isaías 53:4"},
-      {text:"Mas él herido fue por nuestras rebeliones, molido por nuestros pecados; el castigo de nuestra paz fue sobre él, y por su llaga fuimos nosotros curados.", ref:"Isaías 53:5"},
-      {text:"Yo soy Jehová tu sanador.", ref:"Éxodo 15:26b"},
-      {text:"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo.", ref:"Isaías 41:10"},
-      {text:"El que habita al abrigo del Altísimo morará bajo la sombra del Omnipotente. No te sobrevendrá mal, ni plaga tocará tu morada.", ref:"Salmos 91:1,10"}
+      {text:"Aprended a hacer el bien; buscad la justicia.", ref:"Isaías 1:17"},
+      {text:"Bienaventurados los misericordiosos.", ref:"Mateo 5:7"},
+      {text:"El que oprime al pobre afrenta a su Hacedor.", ref:"Proverbios 14:31"},
+      {text:"Dios es misericordioso y compasivo.", ref:"Salmos 103:8"},
+      {text:"Buscad lo bueno y no lo malo.", ref:"Amós 5:14"}
     ]
   },
   {
-    id:"amor", icon:"❤️", color:"#6b1a1a",
-    title:"Para sentir el amor de Dios",
-    desc:"Nada puede separarte de Su amor",
+    id:"liderazgo", icon:"🧭", color:"#3f3a31",
+    title:"Liderazgo según Dios",
+    desc:"Principios de servicio, integridad y ejemplo para guiar a otros",
     verses:[
-      {text:"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref:"Juan 3:16"},
-      {text:"Dios es amor; y el que permanece en amor, permanece en Dios, y Dios en él.", ref:"1 Juan 4:16"},
-      {text:"Nosotros le amamos a él, porque él nos amó primero.", ref:"1 Juan 4:19"},
-      {text:"Ni lo alto, ni lo profundo, ni ninguna otra cosa creada nos podrá separar del amor de Dios, que es en Cristo Jesús Señor nuestro.", ref:"Romanos 8:39"},
-      {text:"El amor es sufrido, es benigno; el amor no tiene envidia, el amor no es jactancioso, no se envanece.", ref:"1 Corintios 13:4"},
-      {text:"Como el Padre me ha amado, así también yo os he amado; permaneced en mi amor.", ref:"Juan 15:9"},
-      {text:"El amor nunca deja de ser.", ref:"1 Corintios 13:8a"},
-      {text:"Con amor eterno te he amado; por tanto, te prolongué mi misericordia.", ref:"Jeremías 31:3"},
-      {text:"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref:"Jeremías 29:11"}
+      {text:"El mayor entre vosotros sea vuestro servidor.", ref:"Mateo 20:26"},
+      {text:"El que desea obispado desea buena obra.", ref:"1 Timoteo 3:1"},
+      {text:"Enseña a los fieles lo que es sano.", ref:"2 Timoteo 2:2"},
+      {text:"Donde no hay dirección sabia, caerá el pueblo.", ref:"Proverbios 11:14"},
+      {text:"Sé fuerte y valiente.", ref:"Josué 1:9"}
     ]
   },
   {
-    id:"estudio", icon:"📚", color:"#3a4a5c",
-    title:"Estudio de la Biblia",
-    desc:"Profundiza en la Palabra cada día",
+    id:"escatologia", icon:"🌅", color:"#2d3850",
+    title:"Escatología y esperanza",
+    desc:"El regreso de Cristo y la creación renovada como esperanza futura",
     verses:[
-      {text:"Lámpara es a mis pies tu palabra, y lumbrera a mi camino.", ref:"Salmos 119:105"},
-      {text:"Toda la Escritura es inspirada por Dios, y útil para enseñar, para redargüir, para corregir, para instruir en justicia.", ref:"2 Timoteo 3:16"},
-      {text:"Escudriñadlo todo; retened lo bueno.", ref:"1 Tesalonicenses 5:21"},
-      {text:"Antes bien, creced en la gracia y el conocimiento de nuestro Señor y Salvador Jesucristo.", ref:"2 Pedro 3:18"},
-      {text:"Llevad la buena batalla de la fe; echa mano de la vida eterna.", ref:"1 Timoteo 6:12"},
-      {text:"Maravillosas son tus obras, oh Jehová; muy profundos son tus pensamientos.", ref:"Salmos 92:5"},
-      {text:"Porque la palabra de Dios es viva y eficaz, y más cortante que toda espada de dos filos.", ref:"Hebreos 4:12"}
+      {text:"Velad, porque no sabéis a qué hora ha de venir vuestro Señor.", ref:"Mateo 24:42"},
+      {text:"No queremos que ignoréis acerca de los que duermen.", ref:"1 Tesalonicenses 4:13"},
+      {text:"El día del Señor vendrá como ladrón en la noche.", ref:"2 Pedro 3:10"},
+      {text:"He aquí hago nuevas todas las cosas.", ref:"Apocalipsis 21:5"},
+      {text:"He aquí, vengo pronto; mi galardón conmigo.", ref:"Apocalipsis 22:12"}
     ]
   }
-];
-
-// ═══════════════════════════════════════════════════════
+];// ═══════════════════════════════════════════════════════
 //  LECTURAS DIARIAS (7 días)
 // ═══════════════════════════════════════════════════════
 const DAILY_READINGS = [
@@ -1435,6 +1561,26 @@ function sendHourlyVerseNotification() {
   } catch (error) {
     showToast(`📬 ${verse.ref}`);
   }
+}
+
+function initializeTheme() {
+  const theme = localStorage.getItem('bible_theme') || 'light';
+  if (theme === 'dark') {
+    document.body.classList.add('theme-dark');
+  }
+  updateThemeButton();
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('theme-dark');
+  localStorage.setItem('bible_theme', isDark ? 'dark' : 'light');
+  updateThemeButton();
+}
+
+function updateThemeButton() {
+  const btn = document.getElementById('theme-btn');
+  if (!btn) return;
+  btn.textContent = document.body.classList.contains('theme-dark') ? 'Activar tema claro' : 'Activar tema oscuro';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1938,6 +2084,7 @@ function showSearch() {
 // ═══════════════════════════════════════════════════════
 updateFavBadge();
 currentDayIndex = new Date().getDay();
+initializeTheme();
 updateNotificationButton();
 
 // Mostrar indicador de carga
